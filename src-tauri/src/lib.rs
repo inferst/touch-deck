@@ -7,15 +7,21 @@ use tower_http::services::ServeDir;
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+    format!("Hello, {name}! You've been greeted from Rust!")
 }
 
+/// # Panics
+///
+/// Will panic if can't setup
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            let deck_path = app.path().resolve("deck", BaseDirectory::Resource)?;
-            tauri::async_runtime::spawn(serve(using_serve_dir(&deck_path), 3000));
+            if !cfg!(dev) {
+                let deck_path = app.path().resolve("deck", BaseDirectory::Resource)?;
+                tauri::async_runtime::spawn(serve(using_serve_dir(&deck_path), 3000));
+            }
+
             Ok(())
         })
         .plugin(tauri_plugin_fs::init())

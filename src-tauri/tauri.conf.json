@@ -14,7 +14,9 @@
       {
         "title": "streamer-bot-deck",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "minWidth": 800,
+        "minHeight": 600
       }
     ],
     "security": {
@@ -31,6 +33,6 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": ["deck"]
+    "resources": {"../apps/deck/dist": "deck/"}
   }
 }

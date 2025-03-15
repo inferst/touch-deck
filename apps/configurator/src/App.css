@@ -1,116 +1,56 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafb);
-}
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-.container {
-  margin: 0;
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
+    --background: hsl(334 62% 100%);
+    --foreground: hsl(334 55% 1%);
+    --muted: hsl(334 35% 95%);
+    --muted-foreground: hsl(334 9% 37%);
+    --popover: hsl(334 62% 100%);
+    --popover-foreground: hsl(334 55% 1%);
+    --card: hsl(334 62% 100%);
+    --card-foreground: hsl(334 55% 1%);
+    --border: hsl(334 5% 95%);
+    --input: hsl(334 5% 95%);
+    --primary: hsl(334 44% 52%);
+    --primary-foreground: hsl(0 0% 100%);
+    --secondary: hsl(334 11% 90%);
+    --secondary-foreground: hsl(334 11% 30%);
+    --accent: hsl(334 20% 82%);
+    --accent-foreground: hsl(334 20% 22%);
+    --destructive: hsl(18 93% 23%);
+    --destructive-foreground: hsl(18 93% 83%);
+    --ring: hsl(334 44% 52%);
+    --chart-1: hsl(334 44% 52%);
+    --chart-2: hsl(334 11% 90%);
+    --chart-3: hsl(334 20% 82%);
+    --chart-4: hsl(334 11% 93%);
+    --chart-5: hsl(334 47% 52%);
+    --radius: 0.5rem;
   }
 
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
+  .dark {
+    --background: hsl(217.5 9.09% 17.25%);
+    --foreground: hsl(334 34% 98%);
+    --muted: hsl(210 9.09% 12.94%);
+    --muted-foreground: hsl(334 0% 60.77%);
+    --popover: hsl(210 9.09% 12.94%);
+    --popover-foreground: hsl(334 34% 98%);
+    --card: hsl(210 9.09% 12.94%);
+    --card-foreground: hsl(334 34% 98%);
+    --border: hsl(334 0% 18.46%);
+    --input: hsl(214.29 5.04% 27.25%);
+    --primary: hsl(226.73 58.43% 65.1%);
+    --primary-foreground: hsl(0 0% 100%);
+    --secondary: hsl(214.29 5.04% 27.25%);
+    --secondary-foreground: hsl(334 0% 100%);
+    --accent: hsl(217.5 9.09% 17.25%);
+    --accent-foreground: hsl(226.73 58.43% 65.1%);
+    --destructive: hsl(0 86.89% 48.16%);
+    --destructive-foreground: hsl(0 0% 0%);
+    --ring: hsl(217.5 9.09% 17.25%);
+    --chart-1: hsl(226.73 58.43% 65.1%);
+    --chart-2: hsl(214.29 5.04% 27.25%);
+    --chart-3: hsl(217.5 9.09% 17.25%);
+    --chart-4: hsl(214.29 5.04% 30.25%);
+    --chart-5: hsl(226.73 61.43% 65.1%);
   }
 }
