@@ -95,8 +95,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuSub>
                       {actions.map((action) => (
                         <SidebarMenuSubItem key={action.name}>
-                          <SidebarMenuSubButton asChild isActive={false}>
-                            <a href="#">{action.name}</a>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={false}
+                          >
+                            <div className="w-full">
+                              <a href="#" className="truncate" title={action.name}>
+                                {action.name}
+                              </a>
+                            </div>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
