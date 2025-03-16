@@ -12,13 +12,10 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { StreamerbotAction, StreamerbotClient } from "@streamerbot/client";
-import { useEffect, useMemo, useState } from "react";
+import { StreamerbotContext } from "@/streamerbot/streamerbot-context";
+import { StreamerbotAction } from "@streamerbot/client";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Input } from "./ui/input";
-
-const client = new StreamerbotClient({
-  host: "192.168.1.57",
-});
 
 type Groups = {
   [key: string]: StreamerbotAction[];
@@ -28,8 +25,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [actions, setActions] = useState<Groups>();
   const [search, setSearch] = useState("");
 
+  const streamerbot = useContext(StreamerbotContext);
+
   useEffect(() => {
-    client.connect().then(() => {
+    const client = streamerbot?.streamerbotClient;
+
+    if (client) {
       client.getActions().then((data) => {
         const actions = data.actions.reduce<Groups>((groups, action) => {
           if (!groups[action.group]) {
@@ -43,12 +44,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         setActions(actions);
       });
-    });
-
-    return () => {
-      client.disconnect();
-    };
-  }, []);
+    } else {
+      setActions({});
+    }
+  }, [streamerbot]);
 
   const filteredActions = useMemo(() => {
     const filtered: Groups = {};
@@ -95,12 +94,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuSub>
                       {actions.map((action) => (
                         <SidebarMenuSubItem key={action.name}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={false}
-                          >
+                          <SidebarMenuSubButton asChild isActive={false}>
                             <div className="w-full">
-                              <a href="#" className="truncate" title={action.name}>
+                              <a
+                                href="#"
+                                className="truncate"
+                                title={action.name}
+                              >
                                 {action.name}
                               </a>
                             </div>
