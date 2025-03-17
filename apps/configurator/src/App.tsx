@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./App.css";
 import { AppSidebar } from "./components/AppSidebar";
 import { DeckGrid } from "./components/DeckGrid";
-import { Settings } from "./components/Settings";
+import { Settings } from "./components/Settings/Settings";
 import { SidebarProvider } from "./components/ui/sidebar";
 import { StreamerbotProvider } from "./streamerbot/StreamerbotContext";
 

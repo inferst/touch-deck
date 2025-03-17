@@ -43,20 +43,21 @@ export function useStreamerbotClient() {
   }
 
   useEffect(() => {
-    if (isSuccess) {
-      if (streamerbotClient) {
-        setStreamerbotClient(undefined);
+    const client = new StreamerbotClient({
+      autoReconnect: false,
+      immediate: false,
+      retries: 0,
+      onDisconnect: () => {
         clearActions();
-      }
+      },
+      ...options,
+    });
 
-      const client = new StreamerbotClient({
-        autoReconnect: false,
-        immediate: false,
-        ...options,
-      });
+    setStreamerbotClient(client);
 
+    if (isSuccess) {
       client.connect().then(() => {
-        setStreamerbotClient(client);
+        invalidateActions();
 
         client.on("Application.ActionAdded", invalidateActions);
         client.on("Application.ActionUpdated", invalidateActions);
@@ -64,7 +65,9 @@ export function useStreamerbotClient() {
       });
     }
 
-    return () => {};
+    return () => {
+      client.disconnect();
+    };
   }, [options, isSuccess]);
 
   return streamerbotClient;

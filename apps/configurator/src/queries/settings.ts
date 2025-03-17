@@ -1,5 +1,9 @@
 import { store } from "@/store";
-import { Settings, StreamerbotSettings } from "@/types/settings";
+import {
+  LayoutSettings,
+  Settings,
+  StreamerbotSettings,
+} from "@/types/settings";
 import { useQuery } from "@tanstack/react-query";
 
 async function getSettings(): Promise<Settings> {
@@ -9,7 +13,12 @@ async function getSettings(): Promise<Settings> {
     endpoint: "",
   };
 
-  return { streamerbot };
+  const layout: LayoutSettings = (await store.get("layout")) ?? {
+    rows: 3,
+    columns: 5,
+  };
+
+  return { streamerbot, layout };
 }
 
 export function useSettingsQuery() {

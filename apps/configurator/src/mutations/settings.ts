@@ -3,8 +3,9 @@ import { Settings } from "@/types/settings";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 async function saveSettings(settings: Settings) {
-	await store.set('streamerbot', settings.streamerbot);
-	await store.save();
+  await store.set("streamerbot", settings.streamerbot);
+  await store.set("layout", settings.layout);
+  await store.save();
 }
 
 export function useSettingsMutation() {
@@ -17,5 +18,5 @@ export function useSettingsMutation() {
     },
   });
 
-	return mutation;
+  return mutation;
 }

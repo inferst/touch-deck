@@ -82,7 +82,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     variant={"outline"}
                   >
                     <a href="#" className="font-medium">
-                      {group || "Default"}
+                      {group || "None"}
                     </a>
                   </SidebarMenuButton>
                   {actions.length ? (
