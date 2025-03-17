@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 async function getSettings(): Promise<Settings> {
   const streamerbot: StreamerbotSettings = (await store.get("streamerbot")) ?? {
     host: "",
+    port: 8080,
+    endpoint: "",
   };
 
   return { streamerbot };

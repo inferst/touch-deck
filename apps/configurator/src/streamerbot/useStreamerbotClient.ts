@@ -21,6 +21,14 @@ export function useStreamerbotClient() {
       if (data.streamerbot.host) {
         options.host = data.streamerbot.host;
       }
+
+      if (data.streamerbot.port) {
+        options.port = data.streamerbot.port;
+      }
+
+      if (data.streamerbot.endpoint) {
+        options.endpoint = data.streamerbot.endpoint;
+      }
     }
 
     return options;

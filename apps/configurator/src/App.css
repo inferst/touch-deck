@@ -54,3 +54,11 @@
     --chart-5: hsl(226.73 61.43% 65.1%);
   }
 }
+
+body {
+  -webkit-user-select: none;
+  user-select: none;
+
+  cursor: default;
+}
+
