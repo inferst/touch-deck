@@ -4,14 +4,14 @@ import { AppSidebar } from "./components/AppSidebar";
 import { DeckGrid } from "./components/DeckGrid";
 import { Settings } from "./components/Settings";
 import { SidebarProvider } from "./components/ui/sidebar";
-import { StreamerbotProvider } from "./streamerbot/streamerbot-context";
+import { StreamerbotProvider } from "./streamerbot/StreamerbotContext";
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
-    <StreamerbotProvider>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <StreamerbotProvider>
         <SidebarProvider>
           <main className="w-full">
             <Settings />
@@ -19,8 +19,8 @@ function App() {
           </main>
           <AppSidebar side="right" collapsible="none" />
         </SidebarProvider>
-      </QueryClientProvider>
-    </StreamerbotProvider>
+      </StreamerbotProvider>
+    </QueryClientProvider>
   );
 }
 

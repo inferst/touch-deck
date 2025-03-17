@@ -1,5 +1,6 @@
-import { useContext, useEffect, useState } from "react";
-import { store } from "./store";
+import { useSettingsMutation } from "@/mutations/settings";
+import { useSettingsQuery } from "@/queries/settings";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -11,51 +12,39 @@ import {
 } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { StreamerbotContext } from "@/streamerbot/streamerbot-context";
 
 export function Settings() {
   const [isOpen, setIsOpen] = useState(false);
   const [host, setHost] = useState("");
 
-  const streamerbot = useContext(StreamerbotContext);
+  const { data, isSuccess, isPending } = useSettingsQuery();
+  const settingsMutation = useSettingsMutation();
 
   const handleSettingsSave = () => {
-    store.set("host", host).then(() => {
-      store.save();
+    settingsMutation.mutate({
+      ...data,
+      streamerbot: {
+        ...data?.streamerbot,
+        host,
+      },
     });
 
     setIsOpen(false);
   };
-
-  useEffect(() => {
-    const host = streamerbot?.clientOptions?.host;
-
-    if (host) {
-      setHost(host);
-    }
-  }, [streamerbot?.clientOptions]);
 
   const handleSettingsOpen = (value: boolean) => {
     setIsOpen(value);
   };
 
   useEffect(() => {
-    store.get<string>("host").then((value) => {
-      streamerbot?.setClientOptions({
-        host: value,
-      });
-    });
+    if (isSuccess) {
+      setHost(data.streamerbot.host);
+    }
+  }, [isSuccess, data?.streamerbot]);
 
-    const unsubscribe = store.onKeyChange<string>("host", (newValue) => {
-      streamerbot?.setClientOptions({
-        host: newValue,
-      });
-    });
-
-    return () => {
-      unsubscribe.then((listener) => listener());
-    };
-  }, []);
+  if (isPending) {
+    return "Loading...";
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleSettingsOpen}>

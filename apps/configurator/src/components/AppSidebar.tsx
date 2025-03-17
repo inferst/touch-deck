@@ -12,9 +12,9 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { StreamerbotContext } from "@/streamerbot/streamerbot-context";
+import { useActionsQuery } from "@/queries/actions";
 import { StreamerbotAction } from "@streamerbot/client";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Input } from "./ui/input";
 
 type Groups = {
@@ -22,32 +22,27 @@ type Groups = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [actions, setActions] = useState<Groups>();
   const [search, setSearch] = useState("");
 
-  const streamerbot = useContext(StreamerbotContext);
+  const { data } = useActionsQuery();
 
-  useEffect(() => {
-    const client = streamerbot?.streamerbotClient;
+  const actions = useMemo(() => {
+    if (data) {
+      const actions = data.reduce<Groups>((groups, action) => {
+        if (!groups[action.group]) {
+          groups[action.group] = [];
+        }
 
-    if (client) {
-      client.getActions().then((data) => {
-        const actions = data.actions.reduce<Groups>((groups, action) => {
-          if (!groups[action.group]) {
-            groups[action.group] = [];
-          }
+        groups[action.group].push(action);
 
-          groups[action.group].push(action);
+        return groups;
+      }, {});
 
-          return groups;
-        }, {});
-
-        setActions(actions);
-      });
+      return actions;
     } else {
-      setActions({});
+      return {};
     }
-  }, [streamerbot]);
+  }, [data]);
 
   const filteredActions = useMemo(() => {
     const filtered: Groups = {};
