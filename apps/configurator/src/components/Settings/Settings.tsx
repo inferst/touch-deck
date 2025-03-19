@@ -75,28 +75,30 @@ export function Settings() {
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button className="m-4">Settings</Button>
-      </DialogTrigger>
-      <DialogContent
-        className={cn(
-          "overflow-y-auto",
-          "max-h-[calc(100dvh-4rem)]",
-          "sm:max-w-[calc(100dvw-4rem)]",
-          "sm:w-3xl",
-        )}
-      >
-        <DialogHeader>
-          <DialogTitle>Settings</DialogTitle>
-          <DialogDescription>Settings Dialog</DialogDescription>
-        </DialogHeader>
-        <SettingsForm
-          data={formData}
-          onSave={handleSave}
-          onCancel={handleCancel}
-        />
-      </DialogContent>
-    </Dialog>
+    <div className="absolute z-10">
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild>
+          <Button className="m-4">Settings</Button>
+        </DialogTrigger>
+        <DialogContent
+          className={cn(
+            "overflow-y-auto",
+            "max-h-[calc(100dvh-4rem)]",
+            "sm:max-w-[calc(100dvw-4rem)]",
+            "sm:w-3xl",
+          )}
+        >
+          <DialogHeader>
+            <DialogTitle>Settings</DialogTitle>
+            <DialogDescription>Settings Dialog</DialogDescription>
+          </DialogHeader>
+          <SettingsForm
+            data={formData}
+            onSave={handleSave}
+            onCancel={handleCancel}
+          />
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

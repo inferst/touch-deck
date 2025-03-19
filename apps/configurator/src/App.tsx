@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./App.css";
 import { AppSidebar } from "./components/AppSidebar";
-import { DeckGrid } from "./components/DeckGrid";
+import { DeckGrid } from "./components/Deck/DeckGrid";
 import { Settings } from "./components/Settings/Settings";
 import { SidebarProvider } from "./components/ui/sidebar";
 import { StreamerbotProvider } from "./streamerbot/StreamerbotContext";
@@ -13,7 +13,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <StreamerbotProvider>
         <SidebarProvider>
-          <main className="w-full">
+          <main className="w-full max-h-screen overflow-hidden">
             <Settings />
             <DeckGrid />
           </main>

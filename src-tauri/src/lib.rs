@@ -1,6 +1,12 @@
 use std::{net::SocketAddr, path::Path};
 
-use axum::Router;
+use axum::{
+    Router,
+    extract::ws::{Message, WebSocketUpgrade},
+    response::IntoResponse,
+    routing::get,
+};
+use serde::{Deserialize, Serialize};
 use tauri::{Manager, path::BaseDirectory};
 use tower_http::services::ServeDir;
 
@@ -17,10 +23,8 @@ fn greet(name: &str) -> String {
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            if !cfg!(dev) {
-                let deck_path = app.path().resolve("deck", BaseDirectory::Resource)?;
-                tauri::async_runtime::spawn(serve(using_serve_dir(&deck_path), 3000));
-            }
+            let deck_path = app.path().resolve("deck", BaseDirectory::Resource)?;
+            tauri::async_runtime::spawn(serve(using_serve_dir(&deck_path), 3001));
 
             Ok(())
         })
@@ -33,11 +37,42 @@ pub fn run() {
 }
 
 fn using_serve_dir(path: &Path) -> Router {
-    Router::new().nest_service("/deck", ServeDir::new(path))
+    Router::new()
+        .nest_service("/deck", ServeDir::new(path))
+        .route(
+            "/ws",
+            get({ move |ws: WebSocketUpgrade| handle_websocket(ws) }),
+        )
 }
 
 async fn serve(app: Router, port: u16) {
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
+}
+
+async fn handle_websocket(ws: WebSocketUpgrade) -> impl IntoResponse {
+    ws.on_upgrade(move |socket| handle_socket(socket))
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct MessageData {
+    message: String,
+}
+
+async fn handle_socket(mut socket: axum::extract::ws::WebSocket) {
+    while let Some(Ok(msg)) = socket.recv().await {
+        if let Message::Text(text) = msg {
+            if let Ok(received) = serde_json::from_str::<MessageData>(&text) {
+                println!("Received: {}", text);
+
+                let response = MessageData {
+                    message: format!("Echo: {}", received.message),
+                };
+
+                let json_response = serde_json::to_string(&response).unwrap();
+                let _ = socket.send(Message::Text(json_response.into())).await;
+            }
+        }
+    }
 }
