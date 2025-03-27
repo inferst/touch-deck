@@ -2,7 +2,9 @@ import {
   SettingsForm,
   SettingsFormData,
 } from "@/components/Settings/SettingsForm";
-import { Button } from "@/components/ui/button";
+import { useSettingsMutation } from "@/mutations/settings";
+import { useSettingsQuery } from "@/queries/settings";
+import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -10,10 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import { useSettingsMutation } from "@/mutations/settings";
-import { useSettingsQuery } from "@/queries/settings";
+} from "@workspace/ui/components/dialog";
+import { cn } from "@workspace/ui/lib/utils";
 import { useMemo, useState } from "react";
 
 export function Settings() {

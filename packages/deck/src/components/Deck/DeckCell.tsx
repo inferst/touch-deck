@@ -1,14 +1,16 @@
-import { DialogHeader } from "@/components/ui/dialog";
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
+  DialogHeader,
+} from "@workspace/ui/components/dialog";
+import { cn } from "@workspace/ui/lib/utils";
 
 type DeckCellProps = {
   id: number;
+  width: number;
 };
 
 export function DeckCell(props: DeckCellProps) {
@@ -17,9 +19,22 @@ export function DeckCell(props: DeckCellProps) {
       <DialogTrigger asChild>
         <div
           key={props.id}
-          className="truncate aspect-square rounded-[calc(10%)] flex items-center justify-center bg-amber-400 cursor-pointer"
+          className={cn(
+            "grow",
+            "truncate",
+            "m-[1.25%]",
+            "rounded-[calc(10%)]",
+            "flex",
+            "items-center",
+            "justify-center",
+            "bg-amber-400",
+            "cursor-pointer",
+            "relative",
+            "w-[var(--width)]",
+          )}
+          style={{ "--width": `${props.width}%` } as React.CSSProperties}
         >
-          {props.id}
+          <div className="w-max">{props.id}</div>
         </div>
       </DialogTrigger>
       <DialogContent>

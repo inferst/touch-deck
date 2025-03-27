@@ -1,3 +1,6 @@
+import { useActionsQuery } from "@/queries/actions";
+import { StreamerbotAction } from "@streamerbot/client";
+import { Input } from "@workspace/ui/components/input";
 import {
   Sidebar,
   SidebarContent,
@@ -11,11 +14,8 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
-import { useActionsQuery } from "@/queries/actions";
-import { StreamerbotAction } from "@streamerbot/client";
+} from "@workspace/ui/components/sidebar";
 import { useMemo, useState } from "react";
-import { Input } from "./ui/input";
 
 type Groups = {
   [key: string]: StreamerbotAction[];

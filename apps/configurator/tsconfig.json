@@ -25,6 +25,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@workspace/ui/*": [
+        "../../packages/ui/src/*"
       ]
     }
   },

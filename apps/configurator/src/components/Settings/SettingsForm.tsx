@@ -1,15 +1,15 @@
-import { Button } from "@/components/ui/button";
-import { Form, FormField } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@workspace/ui/components/button";
+import { Form, FormField } from "@workspace/ui/components/form";
+import { Input } from "@workspace/ui/components/input";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@workspace/ui/components/select";
 import { XIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

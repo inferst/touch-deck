@@ -39,10 +39,7 @@ pub fn run() {
 fn using_serve_dir(path: &Path) -> Router {
     Router::new()
         .nest_service("/deck", ServeDir::new(path))
-        .route(
-            "/ws",
-            get({ move |ws: WebSocketUpgrade| handle_websocket(ws) }),
-        )
+        .route("/ws", get(move |ws: WebSocketUpgrade| handle_websocket(ws)))
 }
 
 async fn serve(app: Router, port: u16) {
@@ -52,7 +49,7 @@ async fn serve(app: Router, port: u16) {
 }
 
 async fn handle_websocket(ws: WebSocketUpgrade) -> impl IntoResponse {
-    ws.on_upgrade(move |socket| handle_socket(socket))
+    ws.on_upgrade(handle_socket)
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -64,7 +61,7 @@ async fn handle_socket(mut socket: axum::extract::ws::WebSocket) {
     while let Some(Ok(msg)) = socket.recv().await {
         if let Message::Text(text) = msg {
             if let Ok(received) = serde_json::from_str::<MessageData>(&text) {
-                println!("Received: {}", text);
+                println!("Received: {text}");
 
                 let response = MessageData {
                     message: format!("Echo: {}", received.message),
