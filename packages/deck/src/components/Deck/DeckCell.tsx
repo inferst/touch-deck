@@ -1,19 +1,40 @@
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
-  DialogTitle,
   DialogDescription,
   DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@workspace/ui/components/dialog";
+import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/ui/lib/utils";
+import { DeckButton } from "src/types/deck";
 
 type DeckCellProps = {
   id: number;
   width: number;
+  button?: DeckButton;
+  onSave: (button: DeckButton) => void;
 };
 
 export function DeckCell(props: DeckCellProps) {
+  const {
+    id,
+    width,
+    button = {
+      id,
+      color: "#3c3c3c",
+    },
+    onSave,
+  } = props;
+
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onSave({
+      ...button,
+      color: event.target.value,
+    });
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -27,24 +48,30 @@ export function DeckCell(props: DeckCellProps) {
             "flex",
             "items-center",
             "justify-center",
-            "bg-amber-400",
             "cursor-pointer",
             "relative",
             "w-[var(--width)]",
+            "bg-[var(--color)]",
           )}
-          style={{ "--width": `${props.width}%` } as React.CSSProperties}
+          style={
+            {
+              "--width": `${width}%`,
+              "--color": `${button.color}`,
+            } as React.CSSProperties
+          }
         >
-          <div className="w-max">{props.id}</div>
+          <div className="w-max">{id}</div>
         </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogTitle>Button Settings</DialogTitle>
           <DialogDescription>
             This action cannot be undone. This will permanently delete your
             account and remove your data from our servers.
           </DialogDescription>
         </DialogHeader>
+        <Input type="color" value={button.color} onChange={handleColorChange} />
       </DialogContent>
     </Dialog>
   );

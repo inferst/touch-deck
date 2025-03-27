@@ -1,15 +1,20 @@
 import { DeckCell } from "@workspace/deck/components/Deck/DeckCell";
 import { cn } from "@workspace/ui/lib/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { DeckButton, DeckButtons } from "src/types/deck";
 
 type DeckGridProps = {
   rows: number;
   columns: number;
+  buttons: DeckButtons;
   className?: string;
+  onSave: (buttons: DeckButtons) => void;
+  onTouchDown: (id: number) => void;
+  onTouchUp: (id: number) => void;
 };
 
 export function DeckGrid(props: DeckGridProps) {
-  const { rows, columns, className } = props;
+  const { rows, columns, buttons, onSave, className } = props;
 
   const [screenRatio, setScreenRatio] = useState(1);
 
@@ -30,6 +35,10 @@ export function DeckGrid(props: DeckGridProps) {
 
     return result;
   }, [rows, columns]);
+
+  const handleSave = (button: DeckButton) => {
+    onSave({ ...buttons, [button.id]: button });
+  };
 
   const handleResize = useCallback(() => {
     const container = containerRef.current;
@@ -67,11 +76,19 @@ export function DeckGrid(props: DeckGridProps) {
           } as React.CSSProperties
         }
       >
-        {grid.map((row) => {
+        {grid.map((row, index) => {
           return (
-            <div className="flex grow">
-              {row.map((cell) => {
-                return <DeckCell width={100 / columns} key={cell} id={cell} />;
+            <div key={index} className="flex grow">
+              {row.map((id) => {
+                return (
+                  <DeckCell
+                    width={100 / columns}
+                    key={id}
+                    id={id}
+                    button={buttons[id]}
+                    onSave={handleSave}
+                  />
+                );
               })}
             </div>
           );
