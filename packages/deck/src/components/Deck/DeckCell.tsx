@@ -8,6 +8,8 @@ import {
 } from "@workspace/ui/components/dialog";
 import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/ui/lib/utils";
+import { PlusIcon } from "lucide-react";
+import { useMemo } from "react";
 import { DeckButton } from "src/types/deck";
 
 type DeckCellProps = {
@@ -35,6 +37,10 @@ export function DeckCell(props: DeckCellProps) {
     });
   };
 
+  const isNotEmpty = useMemo(() => {
+    return button.startActionId || button.endActionId;
+  }, [button]);
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -60,7 +66,13 @@ export function DeckCell(props: DeckCellProps) {
             } as React.CSSProperties
           }
         >
-          <div className="w-max">{id}</div>
+          {isNotEmpty ? (
+            <>{id}</>
+          ) : (
+            <>
+              <PlusIcon />
+            </>
+          )}
         </div>
       </DialogTrigger>
       <DialogContent>

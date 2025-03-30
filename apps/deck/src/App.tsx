@@ -1,14 +1,26 @@
 import { DeckGrid } from "@workspace/deck/components/Deck/DeckGrid";
-
-const ws = new WebSocket("ws://127.0.0.1:3001/ws");
-
-ws.onmessage = (event) => console.log("Received:", JSON.parse(event.data));
-
-ws.onopen = () => {
-  ws.send(JSON.stringify({ message: "Hello, Axum!" }));
-};
+import { useEffect } from "react";
+import useWebSocket from "react-use-websocket";
 
 function App() {
+  const { lastJsonMessage, sendJsonMessage } = useWebSocket(
+    "ws://127.0.0.1:3001/ws",
+  );
+
+  useEffect(() => {
+    sendJsonMessage({
+      message: "Hello, Axum!",
+    });
+  }, [sendJsonMessage]);
+
+  useEffect(() => {
+    console.log(lastJsonMessage);
+  }, [lastJsonMessage]);
+
+  useEffect(() => {
+    console.log('Test');
+  }, []);
+
   const rows = 3;
   const columns = 5;
 
@@ -20,6 +32,7 @@ function App() {
       <DeckGrid
         rows={rows}
         columns={columns}
+        buttons={{}}
         className="flex justify-center items-center h-full grow"
       />
       <div className="w-[100px]">Sidebar</div>

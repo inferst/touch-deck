@@ -8,9 +8,9 @@ type DeckGridProps = {
   columns: number;
   buttons: DeckButtons;
   className?: string;
-  onSave: (buttons: DeckButtons) => void;
-  onTouchDown: (id: number) => void;
-  onTouchUp: (id: number) => void;
+  onSave?: (buttons: DeckButtons) => void;
+  onTouchDown?: (id: number) => void;
+  onTouchUp?: (id: number) => void;
 };
 
 export function DeckGrid(props: DeckGridProps) {
@@ -37,7 +37,7 @@ export function DeckGrid(props: DeckGridProps) {
   }, [rows, columns]);
 
   const handleSave = (button: DeckButton) => {
-    onSave({ ...buttons, [button.id]: button });
+    onSave?.({ ...buttons, [button.id]: button });
   };
 
   const handleResize = useCallback(() => {
