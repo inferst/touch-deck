@@ -11,3 +11,7 @@ export type DeckButtons = {
   [key in string]: DeckButton;
 };
 
+export type DeckPage = {
+  id: string;
+  buttons: DeckButtons;
+};

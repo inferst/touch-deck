@@ -1,10 +1,13 @@
 import { store } from "@/store";
 import { Deck } from "@/types/deck";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { invoke } from "@tauri-apps/api/core";
 
 async function saveDeck(settings: Deck) {
   await store.set("pages", settings.pages);
   await store.save();
+
+  invoke("update");
 }
 
 export function useDeckMutation() {
