@@ -1,20 +1,25 @@
 import { DeckCell } from "@workspace/deck/components/Deck/DeckCell";
+import { ComboboxItem } from "@workspace/ui/components/Combobox/Combobox";
 import { cn } from "@workspace/ui/lib/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { DeckButton, DeckButtons } from "src/types/deck";
+import { DeckButton, DeckButtons, DeckMode } from "src/types/deck";
 
 type DeckGridProps = {
   rows: number;
   columns: number;
   buttons: DeckButtons;
+  actions?: ComboboxItem[];
   className?: string;
+  mode: DeckMode;
+  onClick?: (id?: string) => void;
   onSave?: (buttons: DeckButtons) => void;
   onTouchDown?: (id: number) => void;
   onTouchUp?: (id: number) => void;
 };
 
 export function DeckGrid(props: DeckGridProps) {
-  const { rows, columns, buttons, onSave, className } = props;
+  const { rows, columns, buttons, actions, mode, onClick, onSave, className } =
+    props;
 
   const [screenRatio, setScreenRatio] = useState(1);
 
@@ -86,6 +91,9 @@ export function DeckGrid(props: DeckGridProps) {
                     key={id}
                     id={id}
                     button={buttons[id]}
+                    mode={mode}
+                    actions={actions}
+                    onClick={onClick}
                     onSave={handleSave}
                   />
                 );

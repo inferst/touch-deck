@@ -1,3 +1,9 @@
+import { DeckCellButton } from "@workspace/deck/components/Deck/DeckCellButton";
+import {
+  DeckForm,
+  DeckFormData,
+} from "@workspace/deck/components/Deck/DeckForm";
+import { ComboboxItem } from "@workspace/ui/components/Combobox/Combobox";
 import {
   Dialog,
   DialogContent,
@@ -6,17 +12,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { Input } from "@workspace/ui/components/input";
-import { cn } from "@workspace/ui/lib/utils";
-import { PlusIcon } from "lucide-react";
-import { useMemo } from "react";
-import { DeckButton } from "src/types/deck";
+import { useMemo, useState } from "react";
+import { DeckButton, DeckMode } from "src/types/deck";
 
 type DeckCellProps = {
   id: number;
   width: number;
   button?: DeckButton;
+  mode: DeckMode;
+  actions?: ComboboxItem[];
   onSave: (button: DeckButton) => void;
+  onClick?: (id?: string) => void;
 };
 
 export function DeckCell(props: DeckCellProps) {
@@ -27,53 +33,36 @@ export function DeckCell(props: DeckCellProps) {
       id,
       color: "#3c3c3c",
     },
+    mode,
+    actions,
+    onClick,
     onSave,
   } = props;
 
-  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleSave = (data: DeckFormData) => {
     onSave({
       ...button,
-      color: event.target.value,
+      ...data,
     });
+
+    setIsOpen(false);
   };
 
   const isNotEmpty = useMemo(() => {
-    return button.startActionId || button.endActionId;
+    return !!(button.startActionId || button.endActionId);
   }, [button]);
 
-  return (
-    <Dialog>
+  return mode == "edit" ? (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <div
-          key={props.id}
-          className={cn(
-            "grow",
-            "truncate",
-            "m-[1.25%]",
-            "rounded-[calc(10%)]",
-            "flex",
-            "items-center",
-            "justify-center",
-            "cursor-pointer",
-            "relative",
-            "w-[var(--width)]",
-            "bg-[var(--color)]",
-          )}
-          style={
-            {
-              "--width": `${width}%`,
-              "--color": `${button.color}`,
-            } as React.CSSProperties
-          }
-        >
-          {isNotEmpty ? (
-            <>{id}</>
-          ) : (
-            <>
-              <PlusIcon />
-            </>
-          )}
-        </div>
+        <DeckCellButton
+          id={id}
+          button={button}
+          width={width}
+          isNotEmpty={isNotEmpty}
+        />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -83,8 +72,21 @@ export function DeckCell(props: DeckCellProps) {
             account and remove your data from our servers.
           </DialogDescription>
         </DialogHeader>
-        <Input type="color" value={button.color} onChange={handleColorChange} />
+        <DeckForm
+          data={button}
+          actions={actions}
+          onSave={handleSave}
+          onCancel={() => {}}
+        />
       </DialogContent>
     </Dialog>
+  ) : (
+    <DeckCellButton
+      id={id}
+      button={button}
+      width={width}
+      isNotEmpty={isNotEmpty}
+      onClick={() => onClick?.(button.startActionId)}
+    />
   );
 }

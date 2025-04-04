@@ -1,25 +1,27 @@
 import { useDeckMutation } from "@/mutations/deck";
+import { useActionsQuery } from "@/queries/actions";
 import { useDeckQuery } from "@/queries/deck";
 import { useSettingsQuery } from "@/queries/settings";
 import { DeckButtons } from "@/types/deck";
 import { DeckGrid } from "@workspace/deck/components/Deck/DeckGrid";
-import { DeckButton } from "@workspace/deck/types/deck";
+import { useMemo } from "react";
 
 export function Deck() {
-  const { data: settingsData, isError, isPending } = useSettingsQuery();
+  const settingsQuery = useSettingsQuery();
+  const actionsQuery = useActionsQuery();
+  const deckQuery = useDeckQuery();
+
   const { mutate } = useDeckMutation();
 
-  const {
-    data: deckData,
-    isError: isDeckError,
-    isPending: isDeckPending,
-  } = useDeckQuery();
-
-  if (isPending || isDeckPending) {
+  if (
+    settingsQuery.isPending ||
+    deckQuery.isPending ||
+    actionsQuery.isPending
+  ) {
     return "Loading...";
   }
 
-  if (isError || isDeckError) {
+  if (settingsQuery.isError || deckQuery.isError || actionsQuery.isError) {
     return "Error...";
   }
 
@@ -29,8 +31,8 @@ export function Deck() {
 
   const handleSave = (pageId: string, buttons: DeckButtons) => {
     mutate({
-      ...deckData,
-      pages: deckData.pages.map((page) => {
+      ...deckQuery.data,
+      pages: deckQuery.data.pages.map((page) => {
         if (pageId == page.id) {
           return {
             ...page,
@@ -43,15 +45,24 @@ export function Deck() {
     });
   };
 
+  const actions = useMemo(() => {
+    return actionsQuery.data.map((action) => ({
+      value: action.id,
+      label: action.name,
+    }));
+  }, [actionsQuery.data]);
+
   return (
     <>
-      {deckData.pages.map((page) => {
+      {deckQuery.data.pages.map((page) => {
         return (
           <DeckGrid
             key={page.id}
-            rows={settingsData.layout.rows}
-            columns={settingsData.layout.columns}
+            rows={settingsQuery.data.layout.rows}
+            columns={settingsQuery.data.layout.columns}
             buttons={page.buttons}
+            actions={actions}
+            mode="edit"
             onSave={(buttons) => handleSave(page.id, buttons)}
             onTouchDown={handleTouchDown}
             onTouchUp={handleTouchUp}

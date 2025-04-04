@@ -15,3 +15,5 @@ export type DeckPage = {
   id: string;
   buttons: DeckButtons;
 };
+
+export type DeckMode = 'edit' | 'view';

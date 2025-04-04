@@ -1,7 +1,12 @@
+import { StreamerbotClient } from "@streamerbot/client";
 import { DeckGrid } from "@workspace/deck/components/Deck/DeckGrid";
 import { DeckPage } from "@workspace/deck/types/deck";
 import { useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
+
+const streamerbot = new StreamerbotClient({
+  host: "192.168.1.57",
+});
 
 type Response = {
   name: string;
@@ -32,6 +37,12 @@ function App() {
     console.log(lastJsonMessage);
   }, [lastJsonMessage]);
 
+  const handleClick = (id?: string) => {
+    if (id) {
+      streamerbot.doAction(id);
+    }
+  };
+
   const rows = 3;
   const columns = 5;
 
@@ -47,6 +58,8 @@ function App() {
             rows={rows}
             columns={columns}
             buttons={page.buttons}
+            onClick={handleClick}
+            mode="view"
             className="flex justify-center items-center h-full grow"
           />
         );

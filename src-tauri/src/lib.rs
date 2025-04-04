@@ -5,7 +5,7 @@ use axum::{
     routing::get,
 };
 use std::sync::OnceLock;
-use std::{net::SocketAddr, path::Path, sync::Arc};
+use std::{net::SocketAddr, path::Path};
 use tauri::{AppHandle, Manager, path::BaseDirectory};
 use tokio::sync::broadcast::{self, Sender};
 use tower_http::services::ServeDir;
@@ -14,7 +14,7 @@ use websocket::handle_socket;
 mod websocket;
 
 static APP_HANDLE: OnceLock<AppHandle> = OnceLock::new();
-static SENDER: OnceLock<Arc<Sender<String>>> = OnceLock::new();
+static SENDER: OnceLock<Sender<String>> = OnceLock::new();
 
 /// # Panics
 pub fn app_handle<'a>() -> &'a AppHandle {
@@ -22,18 +22,16 @@ pub fn app_handle<'a>() -> &'a AppHandle {
 }
 
 /// # Panics
-pub fn sender<'a>() -> &'a Arc<Sender<String>> {
+pub fn sender<'a>() -> &'a Sender<String> {
     SENDER.get().unwrap()
 }
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 async fn update() {
-    let result = sender().send(String::from("update"));
-
-    if let Err(message) = result {
-        dbg!(message);
-    }
+    sender()
+        .send(String::from("update"))
+        .expect("error while sending event");
 }
 
 /// # Panics
@@ -62,7 +60,7 @@ pub fn run() {
 
 fn using_serve_dir(path: &Path) -> Router {
     let (tx, _rx) = broadcast::channel::<String>(3);
-    let state = Arc::new(tx);
+    let state = tx;
 
     SENDER.set(state.clone()).unwrap();
 
@@ -70,11 +68,9 @@ fn using_serve_dir(path: &Path) -> Router {
         .nest_service("/deck", ServeDir::new(path))
         .route(
             "/ws",
-            get(
-                move |ws: WebSocketUpgrade, state: State<Arc<Sender<String>>>| {
-                    handle_websocket(ws, state)
-                },
-            ),
+            get(move |ws: WebSocketUpgrade, state: State<Sender<String>>| {
+                handle_websocket(ws, state)
+            }),
         )
         .with_state(state)
 }
@@ -86,9 +82,6 @@ async fn serve(app: Router, port: u16) {
 }
 
 #[allow(clippy::unused_async)]
-async fn handle_websocket(
-    ws: WebSocketUpgrade,
-    state: State<Arc<Sender<String>>>,
-) -> impl IntoResponse {
+async fn handle_websocket(ws: WebSocketUpgrade, state: State<Sender<String>>) -> impl IntoResponse {
     ws.on_upgrade(|socket| handle_socket(socket, state))
 }
