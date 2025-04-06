@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { DeckButton, DeckMode } from "src/types/deck";
 
 type DeckCellProps = {
@@ -22,7 +22,8 @@ type DeckCellProps = {
   mode: DeckMode;
   actions?: ComboboxItem[];
   onSave: (button: DeckButton) => void;
-  onClick?: (id?: string) => void;
+  onActionStart?: (id: string) => void;
+  onActionEnd?: (id: string) => void;
 };
 
 export function DeckCell(props: DeckCellProps) {
@@ -35,7 +36,8 @@ export function DeckCell(props: DeckCellProps) {
     },
     mode,
     actions,
-    onClick,
+    onActionStart,
+    onActionEnd,
     onSave,
   } = props;
 
@@ -50,19 +52,10 @@ export function DeckCell(props: DeckCellProps) {
     setIsOpen(false);
   };
 
-  const isNotEmpty = useMemo(() => {
-    return !!(button.startActionId || button.endActionId);
-  }, [button]);
-
   return mode == "edit" ? (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <DeckCellButton
-          id={id}
-          button={button}
-          width={width}
-          isNotEmpty={isNotEmpty}
-        />
+        <DeckCellButton button={button} width={width} />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -82,11 +75,10 @@ export function DeckCell(props: DeckCellProps) {
     </Dialog>
   ) : (
     <DeckCellButton
-      id={id}
       button={button}
       width={width}
-      isNotEmpty={isNotEmpty}
-      onClick={() => onClick?.(button.startActionId)}
+      onStart={onActionStart}
+      onEnd={onActionEnd}
     />
   );
 }

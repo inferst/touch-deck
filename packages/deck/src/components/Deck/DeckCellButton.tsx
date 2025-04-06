@@ -3,18 +3,36 @@ import { PlusIcon } from "lucide-react";
 import { DeckButton } from "src/types/deck";
 
 type DeckCellButtonProps = {
-  id: number;
   width: number;
   button: DeckButton;
-  isNotEmpty: boolean;
-  onClick?: (id?: string) => void;
+  onClick?: (event: React.MouseEvent) => void;
+  onStart?: (id: string) => void;
+  onEnd?: (id: string) => void;
 };
 
 export function DeckCellButton(props: DeckCellButtonProps) {
+  const handleStart = () => {
+    if (props.button.startActionId) {
+      props.onStart?.(props.button.startActionId);
+    }
+  };
+
+  const handleEnd = () => {
+    if (props.button.endActionId) {
+      props.onEnd?.(props.button.endActionId);
+    }
+  };
+
+  const isActive = props.button.startActionId || props.button.endActionId;
+
   return (
     <div
-      key={props.id}
-      onClick={() => props.onClick?.(props.button.startActionId)}
+      key={props.button.id}
+      onClick={props.onClick}
+      onMouseDown={handleStart}
+      onTouchStart={handleStart}
+      onMouseUp={handleEnd}
+      onTouchEnd={handleEnd}
       className={cn(
         "grow",
         "truncate",
@@ -35,13 +53,7 @@ export function DeckCellButton(props: DeckCellButtonProps) {
         } as React.CSSProperties
       }
     >
-      {props.isNotEmpty ? (
-        <>{props.id}</>
-      ) : (
-        <>
-          <PlusIcon />
-        </>
-      )}
+      {isActive ? props.button.title : <PlusIcon />}
     </div>
   );
 }

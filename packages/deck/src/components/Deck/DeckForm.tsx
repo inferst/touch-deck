@@ -18,12 +18,14 @@ export type DeckFormData = {
   title?: string;
   color?: string;
   startActionId?: string;
+  endActionId?: string;
 };
 
 const schema = z.object({
   title: z.string().optional(),
   color: z.string().optional(),
   startActionId: z.string().optional(),
+  endActionId: z.string().optional(),
 });
 
 type DeckFormProps = {
@@ -34,7 +36,7 @@ type DeckFormProps = {
 };
 
 export function DeckForm(props: DeckFormProps) {
-  const { data, actions, onSave, onCancel } = props;
+  const { data, actions, onSave } = props;
 
   const form = useForm<DeckFormData>({
     resolver: zodResolver(schema),
@@ -84,6 +86,32 @@ export function DeckForm(props: DeckFormProps) {
             <FormField
               control={form.control}
               name="startActionId"
+              render={({ field }) => (
+                <Select
+                  value={field.value?.toString()}
+                  onValueChange={(value) => field.onChange(value)}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Columns" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {actions?.map((value) => (
+                      <SelectItem key={value.value} value={value.value}>
+                        {value.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="endActionId" className="text-right">
+              End Action
+            </Label>
+            <FormField
+              control={form.control}
+              name="endActionId"
               render={({ field }) => (
                 <Select
                   value={field.value?.toString()}

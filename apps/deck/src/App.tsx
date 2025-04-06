@@ -1,64 +1,75 @@
-import { StreamerbotClient } from "@streamerbot/client";
 import { DeckGrid } from "@workspace/deck/components/Deck/DeckGrid";
 import { DeckPage } from "@workspace/deck/types/deck";
 import { useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
 
-const streamerbot = new StreamerbotClient({
-  host: "192.168.1.57",
-});
-
-type Response = {
+type Message = {
   name: string;
   payload: unknown;
 };
 
+type LayoutSettings = {
+  rows: number;
+  columns: number;
+};
+
+type GetDataPayload = {
+  pages: DeckPage[];
+  layout: LayoutSettings;
+};
+
 function App() {
   const { lastJsonMessage, sendJsonMessage } = useWebSocket(
-    "ws://127.0.0.1:3001/ws",
+    `ws://${location.hostname}:3001/ws`,
   );
 
-  const [pages, setPages] = useState<DeckPage[]>([]);
+  const [data, setData] = useState<GetDataPayload>({
+    pages: [],
+    layout: {
+      rows: 0,
+      columns: 0,
+    },
+  });
 
   useEffect(() => {
     sendJsonMessage({
-      name: "buttons",
+      name: "getData",
     });
   }, [sendJsonMessage]);
 
   useEffect(() => {
-    const message = lastJsonMessage as Response;
+    const message = lastJsonMessage as Message;
 
-    if (message && message.name == "buttons") {
-      const payload = message.payload as DeckPage[];
-      setPages(payload);
+    if (message) {
+      switch (message.name) {
+        case "getData": {
+          const payload = message.payload as GetDataPayload;
+          setData(payload);
+        }
+      }
     }
 
     console.log(lastJsonMessage);
   }, [lastJsonMessage]);
 
-  const handleClick = (id?: string) => {
-    if (id) {
-      streamerbot.doAction(id);
-    }
+  const handleAction = async (id: string) => {
+    sendJsonMessage({
+      name: "doAction",
+      payload: id,
+    });
   };
-
-  const rows = 3;
-  const columns = 5;
-
-  // const rows = 5;
-  // const columns = 3;
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {pages.map((page) => {
+      {data.pages.map((page) => {
         return (
           <DeckGrid
             key={page.id}
-            rows={rows}
-            columns={columns}
+            rows={data.layout.rows}
+            columns={data.layout.columns}
             buttons={page.buttons}
-            onClick={handleClick}
+            onActionStart={handleAction}
+            onActionEnd={handleAction}
             mode="view"
             className="flex justify-center items-center h-full grow"
           />

@@ -11,15 +11,23 @@ type DeckGridProps = {
   actions?: ComboboxItem[];
   className?: string;
   mode: DeckMode;
-  onClick?: (id?: string) => void;
+  onActionStart?: (id: string) => void;
+  onActionEnd?: (id: string) => void;
   onSave?: (buttons: DeckButtons) => void;
-  onTouchDown?: (id: number) => void;
-  onTouchUp?: (id: number) => void;
 };
 
 export function DeckGrid(props: DeckGridProps) {
-  const { rows, columns, buttons, actions, mode, onClick, onSave, className } =
-    props;
+  const {
+    rows,
+    columns,
+    buttons,
+    actions,
+    mode,
+    onActionStart,
+    onActionEnd,
+    onSave,
+    className,
+  } = props;
 
   const [screenRatio, setScreenRatio] = useState(1);
 
@@ -29,13 +37,13 @@ export function DeckGrid(props: DeckGridProps) {
     const result = [];
 
     for (let row = 0; row < rows; row++) {
-      const rowResult = [];
+      const rowArray = [];
 
       for (let column = 0; column < columns; column++) {
-        rowResult.push(row * columns + column);
+        rowArray.push(row * columns + column);
       }
 
-      result.push(rowResult);
+      result.push(rowArray);
     }
 
     return result;
@@ -93,7 +101,8 @@ export function DeckGrid(props: DeckGridProps) {
                     button={buttons[id]}
                     mode={mode}
                     actions={actions}
-                    onClick={onClick}
+                    onActionStart={onActionStart}
+                    onActionEnd={onActionEnd}
                     onSave={handleSave}
                   />
                 );

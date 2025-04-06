@@ -3657,6 +3657,7 @@ dependencies = [
  "tauri-plugin-opener",
  "tauri-plugin-store",
  "tokio",
+ "tokio-tungstenite",
  "tower",
  "tower-http",
 ]

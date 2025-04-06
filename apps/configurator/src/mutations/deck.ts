@@ -7,7 +7,7 @@ async function saveDeck(settings: Deck) {
   await store.set("pages", settings.pages);
   await store.save();
 
-  invoke("update");
+  invoke("deck_update");
 }
 
 export function useDeckMutation() {

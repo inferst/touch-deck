@@ -25,10 +25,6 @@ export function Deck() {
     return "Error...";
   }
 
-  const handleTouchDown = (id: number) => {};
-
-  const handleTouchUp = (id: number) => {};
-
   const handleSave = (pageId: string, buttons: DeckButtons) => {
     mutate({
       ...deckQuery.data,
@@ -64,8 +60,6 @@ export function Deck() {
             actions={actions}
             mode="edit"
             onSave={(buttons) => handleSave(page.id, buttons)}
-            onTouchDown={handleTouchDown}
-            onTouchUp={handleTouchUp}
             className="w-full h-full flex justify-center items-center"
           />
         );
