@@ -1,22 +1,24 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
-import { ComboboxItem } from "@workspace/ui/components/Combobox/Combobox";
+import { Combobox, ComboboxItem } from "@workspace/ui/components/Combobox";
+import { Icon, icons } from "@workspace/ui/components/Icon";
 import { Form, FormField } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select";
+import { XIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+const iconItems = icons.map((icon) => ({
+  value: icon,
+  label: icon,
+  icon: <Icon name={icon} />,
+}));
 
 export type DeckFormData = {
   title?: string;
   color?: string;
+  icon?: string;
   startActionId?: string;
   endActionId?: string;
 };
@@ -24,6 +26,7 @@ export type DeckFormData = {
 const schema = z.object({
   title: z.string().optional(),
   color: z.string().optional(),
+  icon: z.string().optional(),
   startActionId: z.string().optional(),
   endActionId: z.string().optional(),
 });
@@ -80,6 +83,37 @@ export function DeckForm(props: DeckFormProps) {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="icon" className="text-right">
+              Icon
+            </Label>
+            <FormField
+              control={form.control}
+              name="icon"
+              render={({ field }) => (
+                <div className="flex">
+                  <Combobox
+                    value={field.value}
+                    items={iconItems ?? []}
+                    placeholder="Icon"
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                  />
+                  {field.value && (
+                    <Button
+                      onClick={() => {
+                        field.onChange("");
+                      }}
+                      variant={"ghost"}
+                    >
+                      <XIcon />
+                    </Button>
+                  )}
+                </div>
+              )}
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="startActionId" className="text-right">
               Start Action
             </Label>
@@ -87,21 +121,26 @@ export function DeckForm(props: DeckFormProps) {
               control={form.control}
               name="startActionId"
               render={({ field }) => (
-                <Select
-                  value={field.value?.toString()}
-                  onValueChange={(value) => field.onChange(value)}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Columns" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {actions?.map((value) => (
-                      <SelectItem key={value.value} value={value.value}>
-                        {value.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex">
+                  <Combobox
+                    value={field.value}
+                    items={actions ?? []}
+                    placeholder="Start Action"
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                  />
+                  {field.value && (
+                    <Button
+                      onClick={() => {
+                        field.onChange("");
+                      }}
+                      variant={"ghost"}
+                    >
+                      <XIcon />
+                    </Button>
+                  )}
+                </div>
               )}
             />
           </div>
@@ -113,21 +152,26 @@ export function DeckForm(props: DeckFormProps) {
               control={form.control}
               name="endActionId"
               render={({ field }) => (
-                <Select
-                  value={field.value?.toString()}
-                  onValueChange={(value) => field.onChange(value)}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Columns" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {actions?.map((value) => (
-                      <SelectItem key={value.value} value={value.value}>
-                        {value.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex">
+                  <Combobox
+                    value={field.value}
+                    items={actions ?? []}
+                    placeholder="End Action"
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                  />
+                  {field.value && (
+                    <Button
+                      onClick={() => {
+                        field.onChange("");
+                      }}
+                      variant={"ghost"}
+                    >
+                      <XIcon />
+                    </Button>
+                  )}
+                </div>
               )}
             />
           </div>

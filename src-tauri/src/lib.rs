@@ -47,6 +47,8 @@ async fn deck_update() {
 
 #[tauri::command]
 async fn settings_update() {
+    deck_update().await;
+
     client_sender()
         .send(ClientMessage::SettingsUpdate)
         .expect("error while sending event");

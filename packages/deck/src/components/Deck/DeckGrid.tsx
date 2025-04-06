@@ -1,5 +1,5 @@
 import { DeckCell } from "@workspace/deck/components/Deck/DeckCell";
-import { ComboboxItem } from "@workspace/ui/components/Combobox/Combobox";
+import { ComboboxItem } from "@workspace/ui/components/Combobox";
 import { cn } from "@workspace/ui/lib/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DeckButton, DeckButtons, DeckMode } from "src/types/deck";

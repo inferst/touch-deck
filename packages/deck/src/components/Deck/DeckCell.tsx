@@ -3,7 +3,7 @@ import {
   DeckForm,
   DeckFormData,
 } from "@workspace/deck/components/Deck/DeckForm";
-import { ComboboxItem } from "@workspace/ui/components/Combobox/Combobox";
+import { ComboboxItem } from "@workspace/ui/components/Combobox";
 import {
   Dialog,
   DialogContent,
@@ -53,7 +53,7 @@ export function DeckCell(props: DeckCellProps) {
   };
 
   return mode == "edit" ? (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <DialogTrigger asChild>
         <DeckCellButton button={button} width={width} />
       </DialogTrigger>

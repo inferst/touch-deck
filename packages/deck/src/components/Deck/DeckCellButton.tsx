@@ -1,5 +1,8 @@
+import { Icon } from "@workspace/ui/components/Icon";
 import { cn } from "@workspace/ui/lib/utils";
-import { PlusIcon } from "lucide-react";
+import { MinusIcon } from "lucide-react";
+import { IconName } from "lucide-react/dynamic";
+import { useState } from "react";
 import { DeckButton } from "src/types/deck";
 
 type DeckCellButtonProps = {
@@ -11,19 +14,31 @@ type DeckCellButtonProps = {
 };
 
 export function DeckCellButton(props: DeckCellButtonProps) {
-  const handleStart = () => {
+  const [isStarted, setIsStarted] = useState(false);
+
+  const handleStart = (event: React.MouseEvent | React.TouchEvent) => {
+    event.preventDefault();
+
     if (props.button.startActionId) {
       props.onStart?.(props.button.startActionId);
     }
+
+    setIsStarted(true);
   };
 
-  const handleEnd = () => {
+  const handleEnd = (event: React.MouseEvent | React.TouchEvent) => {
+    event.preventDefault();
+
     if (props.button.endActionId) {
       props.onEnd?.(props.button.endActionId);
     }
+
+    setIsStarted(false);
   };
 
   const isActive = props.button.startActionId || props.button.endActionId;
+
+  const icon = props.button.icon as IconName;
 
   return (
     <div
@@ -34,15 +49,18 @@ export function DeckCellButton(props: DeckCellButtonProps) {
       onMouseUp={handleEnd}
       onTouchEnd={handleEnd}
       className={cn(
-        "grow",
+        isStarted && "scale-110",
+        "select-none",
         "truncate",
         "m-[1.25%]",
         "rounded-[calc(10%)]",
         "flex",
+        "flex-col",
         "items-center",
         "justify-center",
         "cursor-pointer",
         "relative",
+        "overflow-hidden",
         "w-[var(--width)]",
         "bg-[var(--color)]",
       )}
@@ -53,7 +71,18 @@ export function DeckCellButton(props: DeckCellButtonProps) {
         } as React.CSSProperties
       }
     >
-      {isActive ? props.button.title : <PlusIcon />}
+      {isActive ? (
+        icon ? (
+          <div className="absolute flex flex-col items-center">
+            <Icon name={icon} />
+            {props.button.title}
+          </div>
+        ) : (
+          props.button.title
+        )
+      ) : (
+        <MinusIcon />
+      )}
     </div>
   );
 }

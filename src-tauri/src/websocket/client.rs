@@ -72,6 +72,8 @@ async fn connect(sender: Sender<ClientMessage>) {
     .await;
 
     let _ = receive_task.await;
+
+    println!("WebSocket client exited");
 }
 
 pub async fn client(sender: Sender<ClientMessage>) {
