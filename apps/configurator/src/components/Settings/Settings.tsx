@@ -1,3 +1,4 @@
+import { ConnectionStatus } from "@/components/Settings/ConnectionStatus";
 import {
   SettingsForm,
   SettingsFormData,
@@ -75,7 +76,7 @@ export function Settings() {
   );
 
   return (
-    <div className="absolute z-10">
+    <div className="absolute z-10 flex">
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
           <Button className="m-4">Settings</Button>
@@ -99,6 +100,7 @@ export function Settings() {
           />
         </DialogContent>
       </Dialog>
+      <ConnectionStatus />
     </div>
   );
 }

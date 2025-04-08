@@ -12,7 +12,10 @@ use std::sync::Arc;
 use tauri_plugin_store::StoreExt;
 use tokio::sync::Mutex;
 
-use crate::{ClientMessage, SocketState, app_handle};
+use crate::{
+    app_handle,
+    state::{AppState, ClientMessage, ServerMessage},
+};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct MessageData {
@@ -37,13 +40,16 @@ async fn get_data(socket: Arc<Mutex<SplitSink<WebSocket, Message>>>) {
     let json_response = serde_json::to_string(&response).unwrap();
 
     let mut socket = socket.lock().await;
-    let _ = socket.send(Message::Text(json_response.into())).await;
+    socket
+        .send(Message::Text(json_response.into()))
+        .await
+        .unwrap();
 }
 
-pub async fn handle_socket(socket: axum::extract::ws::WebSocket, state: State<SocketState>) {
+pub async fn handle_socket(socket: axum::extract::ws::WebSocket, state: State<Arc<AppState>>) {
     println!("WebSocket Connected");
 
-    let mut rx = state.socket_sender.subscribe();
+    let mut rx = state.server_sender.subscribe();
 
     let (sender, mut receiver) = socket.split();
 
@@ -52,7 +58,7 @@ pub async fn handle_socket(socket: axum::extract::ws::WebSocket, state: State<So
 
     let task = tokio::spawn(async move {
         while let Ok(message) = rx.recv().await {
-            if message == "getData" {
+            if ServerMessage::DataUpdated == message {
                 get_data(sender.clone()).await;
             }
         }

@@ -1,9 +1,9 @@
+import { DeckButton } from "@workspace/deck/types/deck";
 import { Icon } from "@workspace/ui/components/Icon";
 import { cn } from "@workspace/ui/lib/utils";
 import { MinusIcon } from "lucide-react";
 import { IconName } from "lucide-react/dynamic";
 import { useState } from "react";
-import { DeckButton } from "src/types/deck";
 
 type DeckCellButtonProps = {
   width: number;
@@ -71,18 +71,20 @@ export function DeckCellButton(props: DeckCellButtonProps) {
         } as React.CSSProperties
       }
     >
-      {isActive ? (
-        icon ? (
-          <div className="absolute flex flex-col items-center">
-            <Icon name={icon} />
-            {props.button.title}
-          </div>
+      <div className="absolute flex flex-col items-center">
+        {isActive ? (
+          icon ? (
+            <>
+              <Icon name={icon} />
+              {props.button.title}
+            </>
+          ) : (
+            props.button.title
+          )
         ) : (
-          props.button.title
-        )
-      ) : (
-        <MinusIcon />
-      )}
+          <MinusIcon />
+        )}
+      </div>
     </div>
   );
 }

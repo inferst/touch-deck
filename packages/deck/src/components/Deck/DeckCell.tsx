@@ -3,6 +3,7 @@ import {
   DeckForm,
   DeckFormData,
 } from "@workspace/deck/components/Deck/DeckForm";
+import { DeckButton, DeckMode } from "@workspace/deck/types/deck";
 import { ComboboxItem } from "@workspace/ui/components/Combobox";
 import {
   Dialog,
@@ -13,7 +14,6 @@ import {
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { useState } from "react";
-import { DeckButton, DeckMode } from "src/types/deck";
 
 type DeckCellProps = {
   id: number;
