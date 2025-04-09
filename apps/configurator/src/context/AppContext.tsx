@@ -37,6 +37,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
       },
     );
 
+    console.log("frontend_ready");
+
     invoke("frontend_ready");
 
     return () => {

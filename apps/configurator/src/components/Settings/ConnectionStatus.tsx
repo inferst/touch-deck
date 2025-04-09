@@ -6,11 +6,17 @@ function ConnectionStatus() {
   const context = useAppContext();
 
   return (
-    <Button variant={"ghost"} className="m-4">
+    <Button variant={"ghost"} className="m-2">
       {context.status == "connected" ? (
-        <CheckIcon />
+        <>
+          Connected
+          <CheckIcon />
+        </>
       ) : (
-        <LoaderCircle className="animate-spin" />
+        <>
+          Connecting
+          <LoaderCircle className="animate-spin" />
+        </>
       )}
     </Button>
   );

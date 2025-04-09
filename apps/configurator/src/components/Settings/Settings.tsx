@@ -1,4 +1,5 @@
 import { ConnectionStatus } from "@/components/Settings/ConnectionStatus";
+import { Pages } from "@/components/Settings/Pages";
 import {
   SettingsForm,
   SettingsFormData,
@@ -17,7 +18,12 @@ import {
 import { cn } from "@workspace/ui/lib/utils";
 import { useMemo, useState } from "react";
 
-export function Settings() {
+type SettingsProps = {
+  selectedPageNumber: number;
+  onPageChange: (pageNumber: number) => void;
+};
+
+export function Settings(props: SettingsProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const { data, isError, isPending } = useSettingsQuery();
@@ -76,10 +82,10 @@ export function Settings() {
   );
 
   return (
-    <div className="absolute z-10 flex">
+    <div className="absolute z-10 flex flex-wrap m-4 left-0 right-0 justify-center">
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
-          <Button className="m-4">Settings</Button>
+          <Button className="m-2">Settings</Button>
         </DialogTrigger>
         <DialogContent
           className={cn(
@@ -101,6 +107,10 @@ export function Settings() {
         </DialogContent>
       </Dialog>
       <ConnectionStatus />
+      <Pages
+        selectedPageNumber={props.selectedPageNumber}
+        onPageChange={props.onPageChange}
+      />
     </div>
   );
 }

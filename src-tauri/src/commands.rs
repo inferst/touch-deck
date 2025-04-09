@@ -8,10 +8,7 @@ use crate::state::{AppState, ClientMessage, ServerMessage};
 pub async fn deck_update(app: AppHandle) {
     let state = app.state::<Arc<AppState>>();
 
-    state
-        .server_sender
-        .send(ServerMessage::DataUpdated)
-        .expect("error while sending event");
+    let _ = state.server_sender.send(ServerMessage::DataUpdated);
 }
 
 #[tauri::command]

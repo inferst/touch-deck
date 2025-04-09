@@ -81,34 +81,47 @@ function App() {
   const handleNextPageClick = () => {
     const nextPage = pageNumber + 1;
 
-    if (nextPage > 0) {
+    if (nextPage > 0 && nextPage < data.pages.length) {
       setPageNumber(nextPage);
     }
   };
 
+  const isPrevPageAvailable = pageNumber > 0;
+  const isNextPageAvailable = pageNumber < data.pages.length - 1;
+
   return (
     <div className="flex h-screen overflow-hidden">
-      {page && (
-        <DeckGrid
-          key={page.id}
-          rows={data.layout.rows}
-          columns={data.layout.columns}
-          buttons={page.buttons}
-          onActionStart={handleAction}
-          onActionEnd={handleAction}
-          mode="view"
-          className="flex justify-center items-center h-full grow p-4"
-        />
-      )}
+      <div className="w-full">
+        {page && (
+          <DeckGrid
+            key={page.id}
+            rows={data.layout.rows}
+            columns={data.layout.columns}
+            buttons={page.buttons}
+            onActionStart={handleAction}
+            onActionEnd={handleAction}
+            mode="view"
+            className="flex justify-center items-center h-full grow p-4"
+          />
+        )}
+      </div>
       <div className="flex justify-center items-center mr-4">
         <ButtonGroup orientation="vertical">
-          <Button onClick={handlePrevPageClick} className="size-14">
+          <Button
+            disabled={!isNextPageAvailable}
+            onClick={handleNextPageClick}
+            className="size-14"
+          >
             <ChevronUp className="size-10" />
           </Button>
           <Button variant={"secondary"} className="size-14 text-2xl">
             {pageNumber + 1}
           </Button>
-          <Button onClick={handleNextPageClick} className="size-14">
+          <Button
+            disabled={!isPrevPageAvailable}
+            onClick={handlePrevPageClick}
+            className="size-14"
+          >
             <ChevronDown className="size-10" />
           </Button>
         </ButtonGroup>

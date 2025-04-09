@@ -75,7 +75,7 @@ async fn connect(
             let write = Arc::new(Mutex::new(write));
             let ws_write = write.clone();
 
-            let send_task = tokio::spawn(async move {
+            let mut send_task = tokio::spawn(async move {
                 while let Ok(message) = rx.recv().await {
                     if let ClientMessage::DoAction(id) = message {
                         let data = json!({
@@ -89,9 +89,6 @@ async fn connect(
                         let message = serde_json::to_string(&data).unwrap();
 
                         dbg!(&message);
-                        dbg!(&write);
-
-                        todo!("send_task can't be aborted");
 
                         let _ = write.lock().await.send(Message::Text(message.into())).await;
                     }
@@ -99,17 +96,20 @@ async fn connect(
             });
 
             select! {
-                _ = receive_task => {}
-                _ = send_task => {}
+                _ = receive_task => {
+                    send_task.abort();
+                    Err(())
+                }
+                _ = &mut send_task => {
+                    Err(())
+                }
                 _ = abort_rx.recv() => {
+                    send_task.abort();
                     let _ = ws_write.lock().await.close().await;
-                    println!("aborted");
+                    println!("WebSocket client exited");
+                    Ok(())
                 }
             }
-
-            println!("WebSocket client exited");
-
-            Ok(())
         }
         Err(e) => {
             eprintln!("❌ Не удалось подключиться: {e}");

@@ -6,7 +6,11 @@ import { DeckButtons } from "@/types/deck";
 import { DeckGrid } from "@workspace/deck/components/Deck/DeckGrid";
 import { useMemo } from "react";
 
-export function Deck() {
+type DeckProps = {
+  pageNumber: number;
+};
+
+export function DeckPage(props: DeckProps) {
   const settingsQuery = useSettingsQuery();
   const actionsQuery = useActionsQuery();
   const deckQuery = useDeckQuery();
@@ -48,22 +52,24 @@ export function Deck() {
     }));
   }, [actionsQuery.data]);
 
+  const page = deckQuery.data.pages[props.pageNumber];
+
+  console.log(page);
+
+  if (!page) {
+    return "Not found";
+  }
+
   return (
-    <>
-      {deckQuery.data.pages.map((page) => {
-        return (
-          <DeckGrid
-            key={page.id}
-            rows={settingsQuery.data.layout.rows}
-            columns={settingsQuery.data.layout.columns}
-            buttons={page.buttons}
-            actions={actions}
-            mode="edit"
-            onSave={(buttons) => handleSave(page.id, buttons)}
-            className="w-full h-full flex justify-center items-center"
-          />
-        );
-      })}
-    </>
+    <DeckGrid
+      key={page.id}
+      rows={settingsQuery.data.layout.rows}
+      columns={settingsQuery.data.layout.columns}
+      buttons={page.buttons}
+      actions={actions}
+      mode="edit"
+      onSave={(buttons) => handleSave(page.id, buttons)}
+      className="w-full h-full flex justify-center items-center"
+    />
   );
 }
