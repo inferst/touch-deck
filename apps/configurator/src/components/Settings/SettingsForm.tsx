@@ -3,29 +3,29 @@ import { Button } from "@workspace/ui/components/button";
 import { Form, FormField } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@workspace/ui/components/select";
 import { XIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 export type SettingsFormData = {
-  host?: string;
-  port?: number;
-  endpoint?: string;
+  host: string;
+  port: string;
+  endpoint: string;
   rows: number;
   columns: number;
 };
 
 const schema = z.object({
-  host: z.string().optional(),
-  port: z.number().optional(),
-  endpoint: z.string().optional(),
+  host: z.string(),
+  port: z.string(),
+  endpoint: z.string(),
   rows: z.number().min(2).max(8),
   columns: z.number().min(2).max(8),
 });

@@ -41,7 +41,7 @@ export function Settings(props: SettingsProps) {
       streamerbot: {
         ...current.streamerbot,
         host: formData.host,
-        port: formData.port,
+        port: formData.port == "" ? undefined : Number(formData.port),
         endpoint: formData.endpoint,
       },
       layout: {
@@ -72,9 +72,9 @@ export function Settings(props: SettingsProps) {
 
   const formData = useMemo(
     () => ({
-      host: data.streamerbot.host,
-      port: data.streamerbot.port,
-      endpoint: data.streamerbot.endpoint,
+      host: data.streamerbot.host ?? "",
+      port: data.streamerbot.port?.toString() ?? "",
+      endpoint: data.streamerbot.endpoint ?? "",
       rows: data.layout.rows,
       columns: data.layout.columns,
     }),
