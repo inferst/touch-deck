@@ -35,6 +35,8 @@ const rowsArr = [2, 3, 4, 5, 6, 7, 8];
 
 type SettingsFormProps = {
   data: SettingsFormData;
+  onImport: () => void;
+  onExport: () => void;
   onSave: (data: SettingsFormData) => void;
   onCancel: () => void;
 };
@@ -42,6 +44,8 @@ type SettingsFormProps = {
 export function SettingsForm(props: SettingsFormProps) {
   const {
     data: { host, port, endpoint, rows, columns },
+    onImport,
+    onExport,
     onSave,
     onCancel,
   } = props;
@@ -56,6 +60,14 @@ export function SettingsForm(props: SettingsFormProps) {
       columns,
     },
   });
+
+  const handleImport = () => {
+    onImport();
+  };
+
+  const handleExport = () => {
+    onExport();
+  };
 
   const handleCancel = () => {
     onCancel();
@@ -153,6 +165,16 @@ export function SettingsForm(props: SettingsFormProps) {
                   </Select>
                 )}
               />
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <div className="flex col-end-5 justify-end">
+              <Button type="button" onClick={handleImport} className="ml-2">
+                Import
+              </Button>
+              <Button type="button" onClick={handleExport} className="ml-2">
+                Export
+              </Button>
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">

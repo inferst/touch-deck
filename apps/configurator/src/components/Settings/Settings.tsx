@@ -5,6 +5,7 @@ import {
   SettingsFormData,
 } from "@/components/Settings/SettingsForm";
 import { useSettingsMutation } from "@/mutations/settings";
+import { useDeckQuery } from "@/queries/deck";
 import { useSettingsQuery } from "@/queries/settings";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -16,7 +17,10 @@ import {
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { cn } from "@workspace/ui/lib/utils";
+import { open, save } from "@tauri-apps/plugin-dialog";
+import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { useState } from "react";
+import { useDeckMutation } from "@/mutations/deck";
 
 type SettingsProps = {
   selectedPageNumber: number;
@@ -26,17 +30,19 @@ type SettingsProps = {
 export function Settings(props: SettingsProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { data, isError, isPending } = useSettingsQuery();
+  const settingsQuery = useSettingsQuery();
+  const deckQuery = useDeckQuery();
 
-  const { mutate } = useSettingsMutation();
+  const settingsMutation = useSettingsMutation();
+  const deckMutation = useDeckMutation();
 
   const handleSave = (formData: SettingsFormData) => {
-    const current = data ?? {
+    const current = settingsQuery.data ?? {
       streamerbot: {},
       layout: {},
     };
 
-    mutate({
+    settingsMutation.mutate({
       ...current,
       streamerbot: {
         ...current.streamerbot,
@@ -62,20 +68,54 @@ export function Settings(props: SettingsProps) {
     setIsOpen(value);
   };
 
-  if (isPending) {
+  const handleImport = async () => {
+    const path = await open({
+      filters: [
+        {
+          name: "Json Filter",
+          extensions: ["json"],
+        },
+      ],
+    });
+
+    if (path) {
+      const contents = await readTextFile(path);
+      const json = JSON.parse(contents);
+
+      deckMutation.mutate(json);
+    }
+  };
+
+  const handleExport = async () => {
+    const path = await save({
+      filters: [
+        {
+          name: "Json Filter",
+          extensions: ["json"],
+        },
+      ],
+    });
+
+    if (path) {
+      const contents = JSON.stringify(deckQuery.data);
+      await writeTextFile(path, contents);
+    }
+  };
+
+  if (settingsQuery.isPending || deckQuery.isPending) {
     return "Loading...";
   }
 
-  if (isError) {
+  if (settingsQuery.isError || deckQuery.isError) {
     return "Error...";
   }
 
   const formData = {
-    host: data.streamerbot.host ?? "",
-    port: data.streamerbot.port?.toString() ?? "",
-    endpoint: data.streamerbot.endpoint ?? "",
-    rows: data.layout.rows,
-    columns: data.layout.columns,
+    host: settingsQuery.data.streamerbot.host ?? "",
+    port: settingsQuery.data.streamerbot.port?.toString() ?? "",
+    endpoint: settingsQuery.data.streamerbot.endpoint ?? "",
+    rows: settingsQuery.data.layout.rows,
+    columns: settingsQuery.data.layout.columns,
   };
 
   return (
@@ -100,6 +140,8 @@ export function Settings(props: SettingsProps) {
             data={formData}
             onSave={handleSave}
             onCancel={handleCancel}
+            onImport={handleImport}
+            onExport={handleExport}
           />
         </DialogContent>
       </Dialog>
