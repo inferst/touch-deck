@@ -16,7 +16,7 @@ import {
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { cn } from "@workspace/ui/lib/utils";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 type SettingsProps = {
   selectedPageNumber: number;
@@ -70,16 +70,13 @@ export function Settings(props: SettingsProps) {
     return "Error...";
   }
 
-  const formData = useMemo(
-    () => ({
-      host: data.streamerbot.host ?? "",
-      port: data.streamerbot.port?.toString() ?? "",
-      endpoint: data.streamerbot.endpoint ?? "",
-      rows: data.layout.rows,
-      columns: data.layout.columns,
-    }),
-    [data],
-  );
+  const formData = {
+    host: data.streamerbot.host ?? "",
+    port: data.streamerbot.port?.toString() ?? "",
+    endpoint: data.streamerbot.endpoint ?? "",
+    rows: data.layout.rows,
+    columns: data.layout.columns,
+  };
 
   return (
     <div className="absolute z-10 flex flex-wrap m-4 left-0 right-0 justify-center">

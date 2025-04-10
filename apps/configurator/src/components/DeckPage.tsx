@@ -17,6 +17,38 @@ export function DeckPage(props: DeckProps) {
 
   const { mutate } = useDeckMutation();
 
+  const handleSave = (pageId: string, buttons: DeckButtons) => {
+    mutate({
+      ...deckQuery.data,
+      pages:
+        deckQuery.data?.pages.map((page) => {
+          if (pageId == page.id) {
+            return {
+              ...page,
+              buttons,
+            };
+          }
+
+          return page;
+        }) ?? [],
+    });
+  };
+
+  const actions = useMemo(() => {
+    return (
+      actionsQuery.data?.map((action) => ({
+        value: action.id,
+        label: action.name,
+      })) ?? []
+    );
+  }, [actionsQuery.data]);
+
+  const page = deckQuery.data?.pages[props.pageNumber];
+
+  if (!page) {
+    return "Not found";
+  }
+
   if (
     settingsQuery.isPending ||
     deckQuery.isPending ||
@@ -27,37 +59,6 @@ export function DeckPage(props: DeckProps) {
 
   if (settingsQuery.isError || deckQuery.isError || actionsQuery.isError) {
     return "Error...";
-  }
-
-  const handleSave = (pageId: string, buttons: DeckButtons) => {
-    mutate({
-      ...deckQuery.data,
-      pages: deckQuery.data.pages.map((page) => {
-        if (pageId == page.id) {
-          return {
-            ...page,
-            buttons,
-          };
-        }
-
-        return page;
-      }),
-    });
-  };
-
-  const actions = useMemo(() => {
-    return actionsQuery.data.map((action) => ({
-      value: action.id,
-      label: action.name,
-    }));
-  }, [actionsQuery.data]);
-
-  const page = deckQuery.data.pages[props.pageNumber];
-
-  console.log(page);
-
-  if (!page) {
-    return "Not found";
   }
 
   return (

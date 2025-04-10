@@ -4,3 +4,11 @@ body {
 
   cursor: default;
 }
+
+input,
+textarea {
+  user-select: initial;
+  -webkit-user-select: initial;
+
+  cursor: initial;
+}
