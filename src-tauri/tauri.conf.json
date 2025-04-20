@@ -13,8 +13,8 @@
     "windows": [
       {
         "title": "streamer-bot-deck",
-        "width": 1400,
-        "height": 1000,
+        "width": 800,
+        "height": 600,
         "minWidth": 800,
         "minHeight": 600,
         "contentProtected": true

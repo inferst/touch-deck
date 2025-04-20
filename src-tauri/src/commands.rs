@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use tauri::{AppHandle, Manager};
 
-use crate::state::{AppState, ClientMessage, ServerMessage};
+use crate::state::{AppData, AppState, ClientMessage, ServerMessage};
 
 #[tauri::command]
 pub async fn deck_update(app: AppHandle) {
@@ -20,8 +20,8 @@ pub async fn settings_update(app: AppHandle) {
 }
 
 #[tauri::command]
-pub async fn frontend_ready(app: AppHandle) {
+pub async fn get_state(app: AppHandle) -> AppData {
     let state = app.state::<Arc<AppState>>();
-
-    state.emit_status().await;
+    let guard = state.data.lock().await;
+    guard.clone()
 }

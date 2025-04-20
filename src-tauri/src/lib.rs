@@ -4,7 +4,7 @@ use axum::{
     response::IntoResponse,
     routing::get,
 };
-use commands::{deck_update, frontend_ready, settings_update};
+use commands::{deck_update, get_state, settings_update};
 use state::AppState;
 use std::sync::{Arc, OnceLock};
 use std::{net::SocketAddr, path::Path};
@@ -46,7 +46,7 @@ pub async fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
-            frontend_ready,
+            get_state,
             deck_update,
             settings_update
         ])

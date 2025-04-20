@@ -2,7 +2,7 @@ use std::{sync::Arc, time::Duration};
 
 use futures::{SinkExt, StreamExt};
 use serde_json::{Value, json};
-use tauri::{Emitter, Manager};
+use tauri::Manager;
 use tauri_plugin_store::StoreExt;
 use tokio::{
     select,
@@ -43,10 +43,6 @@ async fn connect(
         Ok((ws_stream, _)) => {
             println!("WebSocket handshake has been successfully completed: {url}");
 
-            app_handle()
-                .emit("streamerbot-status", "connected")
-                .unwrap();
-
             let state = app_handle().state::<Arc<AppState>>();
             state.set_status(SocketStatus::Connected).await;
 
@@ -57,6 +53,7 @@ async fn connect(
                     match msg {
                         Ok(Message::Text(txt)) => println!("📥 Ответ: {txt}"),
                         Ok(Message::Close(_)) => {
+                            let state = app_handle().state::<Arc<AppState>>();
                             state.set_status(SocketStatus::Disconnected).await;
                             println!("🔒 Соединение закрыто сервером");
                             break;

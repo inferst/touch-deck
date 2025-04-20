@@ -26,35 +26,47 @@ pub enum SocketStatus {
     Disconnected,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AppData {
+    pub status: SocketStatus,
+}
+
 #[derive(Debug)]
 pub struct AppState {
-    pub status: Mutex<SocketStatus>,
+    pub data: Mutex<AppData>,
     pub server_sender: broadcast::Sender<ServerMessage>,
     pub client_sender: broadcast::Sender<ClientMessage>,
 }
 
 impl AppState {
     pub fn new() -> Self {
-        let (socket_tx, _rx) = broadcast::channel::<ServerMessage>(10);
-        let (client_tx, _rx) = broadcast::channel::<ClientMessage>(10);
+        let (socket_tx, _rx) = broadcast::channel::<ServerMessage>(1);
+        let (client_tx, _rx) = broadcast::channel::<ClientMessage>(1);
+
+        let data = Mutex::new(AppData {
+            status: SocketStatus::Disconnected,
+        });
 
         AppState {
-            status: Mutex::new(SocketStatus::Disconnected),
+            data,
             server_sender: socket_tx,
             client_sender: client_tx.clone(),
         }
     }
 
-    pub async fn set_status(&self, value: SocketStatus) {
-        let mut status = self.status.lock().await;
-        *status = value.clone();
+    pub async fn set_status(&self, status: SocketStatus) {
+        let mut data = self.data.lock().await;
+        data.status = status;
+        let new_data = data.clone();
+        drop(data);
 
-        app_handle().emit::<SocketStatus>("streamerbot-status", value).unwrap();
+        self.set_state_data(new_data).await;
     }
 
-    pub async fn emit_status(&self) {
-        let status = self.status.lock().await.clone();
+    pub async fn set_state_data(&self, value: AppData) {
+        let mut data = self.data.lock().await;
+        *data = value.clone();
 
-        app_handle().emit::<SocketStatus>("streamerbot-status", status).unwrap();
+        app_handle().emit::<AppData>("state-update", value).unwrap();
     }
 }

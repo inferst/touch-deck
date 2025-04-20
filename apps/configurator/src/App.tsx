@@ -15,7 +15,7 @@ function App() {
         <AppProvider>
           <SidebarProvider>
             <Deck />
-            <AppSidebar side="right" collapsible="none" />
+            {/* <AppSidebar side="right" collapsible="none" /> */}
           </SidebarProvider>
         </AppProvider>
       </StreamerbotProvider>

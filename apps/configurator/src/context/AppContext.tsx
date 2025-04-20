@@ -2,6 +2,10 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
+export type AppState = {
+  status: StreamerbotStatus;
+};
+
 export type StreamerbotStatus = "connected" | "disconnected";
 
 export type AppContextValue = {
@@ -28,18 +32,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   useEffect(() => {
-    const listener = listen<StreamerbotStatus>(
-      "streamerbot-status",
-      (event) => {
-        setState({
-          status: event.payload,
-        });
-      },
-    );
+    const listener = listen<AppState>("state-update", (event) => {
+      setState(event.payload);
+    });
 
-    console.log("frontend_ready");
-
-    invoke("frontend_ready");
+    invoke<AppState>("get_state").then((payload) => {
+      setState(payload);
+    });
 
     return () => {
       listener.then((unlisten) => unlisten());
