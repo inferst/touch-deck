@@ -6,10 +6,15 @@ export type AppState = {
   status: StreamerbotStatus;
 };
 
+export type ErrorEvent = {
+  message: string;
+};
+
 export type StreamerbotStatus = "connected" | "disconnected";
 
 export type AppContextValue = {
   status: StreamerbotStatus;
+  error: string;
 };
 
 export const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -29,19 +34,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [state, setState] = useState<AppContextValue>({
     status: "disconnected",
+    error: "",
   });
 
   useEffect(() => {
-    const listener = listen<AppState>("state-update", (event) => {
-      setState(event.payload);
-    });
+    const listeners = [
+      listen<AppState>("state-update", (event) => {
+        setState({ ...state, status: event.payload.status });
+      }),
+      listen<ErrorEvent>("error", (event) => {
+        setState({ ...state, error: event.payload.message });
+      }),
+    ];
 
     invoke<AppState>("get_state").then((payload) => {
-      setState(payload);
+      setState({ ...state, status: payload.status });
     });
 
     return () => {
-      listener.then((unlisten) => unlisten());
+      listeners.map((listener) => listener.then((unlisten) => unlisten()));
     };
   }, []);
 

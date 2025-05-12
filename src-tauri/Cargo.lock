@@ -4465,6 +4465,7 @@ dependencies = [
  "tauri-plugin-fs",
  "tauri-plugin-opener",
  "tauri-plugin-store",
+ "thiserror 2.0.12",
  "tokio",
  "tokio-tungstenite",
  "tower",

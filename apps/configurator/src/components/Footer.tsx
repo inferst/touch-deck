@@ -2,9 +2,11 @@ import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { cn } from "@workspace/ui/lib/utils";
 import { QRCodeCanvas } from "./QRCode/QRCode";
 
 export function Footer() {
@@ -14,14 +16,15 @@ export function Footer() {
         <DialogTrigger asChild>
           <Button className="m-2">Open Deck</Button>
         </DialogTrigger>
-        <DialogContent
-          className={cn(
-            "overflow-y-auto",
-            "max-h-[calc(100dvh-4rem)]",
-            "sm:max-w-[calc(100dvw-4rem)]",
-            "sm:w-3xl",
-          )}
-        >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              Scan with your phone
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Make sure your phone in the same wifi network
+            </DialogDescription>
+          </DialogHeader>
           <QRCodeCanvas />
         </DialogContent>
       </Dialog>

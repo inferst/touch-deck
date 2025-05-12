@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SidebarProvider } from "@workspace/ui/components/sidebar";
 import "./App.css";
 import { StreamerbotProvider } from "./streamerbot/StreamerbotContext";
+import { ErrorDialog } from "./components/ErrorDialog";
 
 const queryClient = new QueryClient();
 
@@ -15,6 +16,7 @@ function App() {
           <SidebarProvider>
             <Deck />
           </SidebarProvider>
+          <ErrorDialog />
         </AppProvider>
       </StreamerbotProvider>
     </QueryClientProvider>

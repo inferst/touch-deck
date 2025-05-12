@@ -14,22 +14,23 @@ export function QRCodeCanvas() {
   }, []);
 
   useEffect(() => {
-    QRCode.toCanvas(
-      ref.current,
-      url,
-      {
-        scale: 8,
-      },
-      function (error) {
-        if (error) console.error(error);
-        console.log("success!");
-      },
-    );
+    if (url) {
+      QRCode.toCanvas(
+        ref.current,
+        url,
+        {
+          scale: 8,
+        },
+        function (error) {
+          if (error) console.error(error);
+          console.log("success!");
+        },
+      );
+    }
   }, [url]);
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="mb-4">Scan with your phone</div>
       <canvas ref={ref}></canvas>
       <div className="mt-4">
         Open in browser -{" "}
