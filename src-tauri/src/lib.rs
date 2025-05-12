@@ -4,7 +4,7 @@ use axum::{
     response::IntoResponse,
     routing::get,
 };
-use commands::{deck_update, get_state, settings_update};
+use commands::{deck_update, get_deck_url, get_state, settings_update};
 use state::AppState;
 use std::sync::{Arc, OnceLock};
 use std::{net::SocketAddr, path::Path};
@@ -15,6 +15,8 @@ use websocket::{client::client, server::handle_socket};
 mod commands;
 mod state;
 mod websocket;
+
+const PORT: u16 = 3001;
 
 static APP_HANDLE: OnceLock<AppHandle> = OnceLock::new();
 
@@ -37,7 +39,7 @@ pub async fn run() {
             app.manage(state);
 
             let deck_path = app.path().resolve("deck", BaseDirectory::Resource)?;
-            tokio::spawn(serve(using_serve_dir(&deck_path, socket_state), 3001));
+            tokio::spawn(serve(using_serve_dir(&deck_path, socket_state), PORT));
 
             Ok(())
         })
@@ -48,7 +50,8 @@ pub async fn run() {
         .invoke_handler(tauri::generate_handler![
             get_state,
             deck_update,
-            settings_update
+            settings_update,
+            get_deck_url,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");

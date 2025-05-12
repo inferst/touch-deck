@@ -60,10 +60,6 @@ export function DeckCell(props: DeckCellProps) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Button Settings</DialogTitle>
-          <DialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
-          </DialogDescription>
         </DialogHeader>
         <DeckForm
           data={button}
