@@ -158,7 +158,9 @@ fn get_value_string(value: &Value, key: &str, default: &str) -> String {
 
 fn get_streamer_bot_url() -> String {
     let store = app_handle().store("settings.json").unwrap();
-    let streamerbot = store.get("streamerbot").unwrap_or("");
+    let streamerbot = store
+        .get("streamerbot")
+        .unwrap_or(Value::String("".to_string()));
 
     let default_host = "127.0.0.1";
     let default_port = "8080";
