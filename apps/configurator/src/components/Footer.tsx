@@ -1,12 +1,9 @@
+import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { Button } from "@workspace/ui/components/button";
-import { DialogHeader } from "@workspace/ui/components/dialog";
 import { cn } from "@workspace/ui/lib/utils";
 import { QRCodeCanvas } from "./QRCode/QRCode";
 

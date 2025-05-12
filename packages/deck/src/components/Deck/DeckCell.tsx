@@ -8,7 +8,6 @@ import { ComboboxItem } from "@workspace/ui/components/Combobox";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,

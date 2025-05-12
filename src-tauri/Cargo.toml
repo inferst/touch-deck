@@ -1,5 +1,5 @@
 [package]
-name = "streamer-bot-deck"
+name = "touchdeck"
 version = "0.1.0"
 description = "Stream Deck Killer"
 authors = ["MikeRime"]

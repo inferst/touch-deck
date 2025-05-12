@@ -3742,27 +3742,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
-name = "streamer-bot-deck"
-version = "0.1.0"
-dependencies = [
- "axum",
- "futures",
- "local-ip-address",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-opener",
- "tauri-plugin-store",
- "tokio",
- "tokio-tungstenite",
- "tower",
- "tower-http",
-]
-
-[[package]]
 name = "string_cache"
 version = "0.8.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4469,6 +4448,27 @@ dependencies = [
  "serde_spanned",
  "toml_datetime",
  "winnow 0.7.3",
+]
+
+[[package]]
+name = "touchdeck"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "futures",
+ "local-ip-address",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-opener",
+ "tauri-plugin-store",
+ "tokio",
+ "tokio-tungstenite",
+ "tower",
+ "tower-http",
 ]
 
 [[package]]
