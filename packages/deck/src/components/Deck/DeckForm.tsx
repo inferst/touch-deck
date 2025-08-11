@@ -1,6 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
-import { Combobox, ComboboxItem } from "@workspace/ui/components/Combobox";
+import {
+  Combobox,
+  ComboboxItem,
+} from "@workspace/ui/components/Combobox";
+
+import {
+  VirtualizedCombobox,
+} from "@workspace/ui/components/VirtualizedCombobox";
 import { Icon, icons } from "@workspace/ui/components/Icon";
 import { Form, FormField } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
@@ -91,7 +98,7 @@ export function DeckForm(props: DeckFormProps) {
               name="icon"
               render={({ field }) => (
                 <div className="flex">
-                  <Combobox
+                  <VirtualizedCombobox
                     value={field.value}
                     items={iconItems ?? []}
                     placeholder="Icon"
