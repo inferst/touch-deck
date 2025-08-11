@@ -10,7 +10,7 @@ export type ErrorEvent = {
   message: string;
 };
 
-export type StreamerbotStatus = "connected" | "disconnected";
+export type StreamerbotStatus = "connected" | "connecting" | "disconnected";
 
 export type AppContextValue = {
   status: StreamerbotStatus;
@@ -39,7 +39,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const listeners = [
-      listen<AppState>("state-update", (event) => {
+      listen<AppState>("state_update", (event) => {
         setState({ ...state, status: event.payload.status });
       }),
       listen<ErrorEvent>("error", (event) => {

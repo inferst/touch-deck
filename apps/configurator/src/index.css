@@ -9,6 +9,44 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.theme-custom {
+    /* Name: custom color palette
+       Author: Ilias Ism
+       URL: https://gradient.page */
+
+    /* CSS: .bg-gradient { background: var(--gradient) } */
+    --gradient: #0582ca;
+
+    --background: 215 61.75% 3.28%;
+    --foreground: 215 9.5% 97.05%;
+
+    --muted: 215 47.5% 12.299999999999999%;
+    --muted-foreground: 215 9.5% 54.1%;
+
+    --popover: 215 46% 5.33%;
+    --popover-foreground: 215 9.5% 97.05%;
+
+    --card: 215 46% 5.33%;
+    --card-foreground: 215 9.5% 97.05%;
+
+    --border: 215 47.5% 12.299999999999999%;
+    --input: 215 47.5% 12.299999999999999%;
+
+    --primary: 215 95% 41%;
+    --primary-foreground: 215 9.5% 97.05%;
+
+    --secondary: 215 47.5% 12.299999999999999%;
+    --secondary-foreground: 215 9.5% 97.05%;
+
+    --accent: 215 47.5% 12.299999999999999%;
+    --accent-foreground: 215 9.5% 97.05%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 215 9.5% 97.05%;
+
+    --ring: 215 95% 41%;
+}
+
 @layer base {
   :root {
     --background: hsl(334 62% 100%);
@@ -49,13 +87,13 @@
     --card-foreground: hsl(334 34% 98%);
     --border: hsl(334 0% 18.46%);
     --input: hsl(214.29 5.04% 27.25%);
-    --primary: hsl(226.73 58.43% 65.1%);
+    --primary: #0582ca;
     --primary-foreground: hsl(0 0% 100%);
     --secondary: hsl(214.29 5.04% 27.25%);
     --secondary-foreground: hsl(334 0% 100%);
     --accent: hsl(217.5 9.09% 17.25%);
     --accent-foreground: hsl(226.73 58.43% 65.1%);
-    --destructive: hsl(0 86.89% 48.16%);
+    --destructive: #e75a7c;
     --destructive-foreground: hsl(0 0% 0%);
     --ring: hsl(217.5 9.09% 17.25%);
     --chart-1: hsl(226.73 58.43% 65.1%);

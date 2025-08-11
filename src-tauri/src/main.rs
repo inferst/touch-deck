@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    streamer_bot_deck_lib::run();
+    touch_deck_lib::run();
 }

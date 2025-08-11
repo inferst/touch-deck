@@ -15,6 +15,8 @@ use websocket::{client::client, server::handle_socket};
 mod commands;
 mod state;
 mod websocket;
+mod settings;
+mod get_ip;
 
 const PORT: u16 = 3001;
 

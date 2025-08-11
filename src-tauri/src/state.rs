@@ -1,14 +1,11 @@
 use serde::{Deserialize, Serialize};
 use tauri::Emitter;
-use tokio::sync::{
-    Mutex,
-    broadcast::{self},
-};
+use tokio::sync::{Mutex, broadcast};
 
 use crate::app_handle;
 
 #[derive(Debug, Clone)]
-pub enum ClientMessage {
+pub enum SBMessage {
     SettingsUpdated,
     DoAction(String),
 }
@@ -22,6 +19,8 @@ pub enum ServerMessage {
 pub enum SocketStatus {
     #[serde(rename = "connected")]
     Connected,
+    #[serde(rename = "connecting")]
+    Connecting,
     #[serde(rename = "disconnected")]
     Disconnected,
 }
@@ -35,13 +34,14 @@ pub struct AppData {
 pub struct AppState {
     pub data: Mutex<AppData>,
     pub server_sender: broadcast::Sender<ServerMessage>,
-    pub client_sender: broadcast::Sender<ClientMessage>,
+    // Streamer.bot
+    pub sb_sender: broadcast::Sender<SBMessage>,
 }
 
 impl AppState {
     pub fn new() -> Self {
         let (socket_tx, _rx) = broadcast::channel::<ServerMessage>(1);
-        let (client_tx, _rx) = broadcast::channel::<ClientMessage>(1);
+        let (sb_tx, _rx) = broadcast::channel::<SBMessage>(1);
 
         let data = Mutex::new(AppData {
             status: SocketStatus::Disconnected,
@@ -50,23 +50,16 @@ impl AppState {
         AppState {
             data,
             server_sender: socket_tx,
-            client_sender: client_tx.clone(),
+            sb_sender: sb_tx.clone(),
         }
     }
 
     pub async fn set_status(&self, status: SocketStatus) {
         let mut data = self.data.lock().await;
         data.status = status;
-        let new_data = data.clone();
-        drop(data);
 
-        self.set_state_data(new_data).await;
-    }
-
-    pub async fn set_state_data(&self, value: AppData) {
-        let mut data = self.data.lock().await;
-        *data = value.clone();
-
-        app_handle().emit::<AppData>("state-update", value).unwrap();
+        app_handle()
+            .emit::<AppData>("state_update", data.clone())
+            .unwrap();
     }
 }

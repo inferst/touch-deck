@@ -134,7 +134,7 @@ export function Settings(props: SettingsProps) {
         >
           <DialogHeader>
             <DialogTitle>Settings</DialogTitle>
-            <DialogDescription>Settings Dialog</DialogDescription>
+            <DialogDescription>Touch Deck Settings</DialogDescription>
           </DialogHeader>
           <SettingsForm
             data={formData}

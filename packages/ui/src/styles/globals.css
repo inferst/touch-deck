@@ -39,7 +39,7 @@
   }
 
   .dark {
-    --background: hsl(217.5 9.09% 17.25%);
+    --background: hsla(200, 75%, 7.8431%);
     --foreground: hsl(334 34% 98%);
     --muted: hsl(210 9.09% 12.94%);
     --muted-foreground: hsl(334 0% 60.77%);
@@ -51,7 +51,7 @@
     --input: hsl(214.29 5.04% 27.25%);
     --primary: hsl(226.73 58.43% 65.1%);
     --primary-foreground: hsl(0 0% 100%);
-    --secondary: hsl(214.29 5.04% 27.25%);
+    --secondary: hsla(200, 75%, 7.8431%);
     --secondary-foreground: hsl(334 0% 100%);
     --accent: hsl(217.5 9.09% 17.25%);
     --accent-foreground: hsl(226.73 58.43% 65.1%);

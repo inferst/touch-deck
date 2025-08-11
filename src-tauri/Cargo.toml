@@ -1,5 +1,5 @@
 [package]
-name = "touchdeck"
+name = "touch_deck"
 version = "0.1.0"
 description = "Stream Deck Killer"
 authors = ["MikeRime"]
@@ -11,7 +11,7 @@ edition = "2024"
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
-name = "streamer_bot_deck_lib"
+name = "touch_deck_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
@@ -29,8 +29,8 @@ tower = "0.5"
 tower-http = {version = "0.6.2", features = ["fs"] }
 tauri-plugin-fs = "2"
 tauri-plugin-store = "2"
+tauri-plugin-dialog = "2"
 futures = "0.3.31"
 tokio-tungstenite = "0.26.2"
-tauri-plugin-dialog = "2"
 local-ip-address = "0.6.5"
 thiserror = "2.0.12"

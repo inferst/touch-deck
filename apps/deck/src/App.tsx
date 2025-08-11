@@ -105,27 +105,29 @@ function App() {
           />
         )}
       </div>
-      <div className="flex justify-center items-center mr-4">
-        <ButtonGroup orientation="vertical">
-          <Button
-            disabled={!isNextPageAvailable}
-            onClick={handleNextPageClick}
-            className="size-14"
-          >
-            <ChevronUp className="size-10" />
-          </Button>
-          <Button variant={"secondary"} className="size-14 text-2xl">
-            {pageNumber + 1}
-          </Button>
-          <Button
-            disabled={!isPrevPageAvailable}
-            onClick={handlePrevPageClick}
-            className="size-14"
-          >
-            <ChevronDown className="size-10" />
-          </Button>
-        </ButtonGroup>
-      </div>
+      {data.pages.length > 1 && (
+        <div className="flex justify-center items-center mr-4">
+          <ButtonGroup orientation="vertical">
+            <Button
+              disabled={!isNextPageAvailable}
+              onClick={handleNextPageClick}
+              className="size-14"
+            >
+              <ChevronUp className="size-10" />
+            </Button>
+            <Button variant={"secondary"} className="size-14 text-2xl">
+              {pageNumber + 1}
+            </Button>
+            <Button
+              disabled={!isPrevPageAvailable}
+              onClick={handlePrevPageClick}
+              className="size-14"
+            >
+              <ChevronDown className="size-10" />
+            </Button>
+          </ButtonGroup>
+        </div>
+      )}
     </div>
   );
 }

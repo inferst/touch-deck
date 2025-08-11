@@ -36,8 +36,6 @@ export function DeckCellButton(props: DeckCellButtonProps) {
     setIsStarted(false);
   };
 
-  const isActive = props.button.startActionId || props.button.endActionId;
-
   const icon = props.button.icon as IconName;
 
   return (
@@ -72,18 +70,8 @@ export function DeckCellButton(props: DeckCellButtonProps) {
       }
     >
       <div className="absolute flex flex-col items-center">
-        {isActive ? (
-          icon ? (
-            <>
-              <Icon name={icon} />
-              {props.button.title}
-            </>
-          ) : (
-            props.button.title
-          )
-        ) : (
-          <MinusIcon />
-        )}
+        {icon && <Icon name={icon} />}
+        {props.button.title ? props.button.title : <MinusIcon />}
       </div>
     </div>
   );
