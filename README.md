@@ -1,7 +1,9 @@
-# Tauri + React + Typescript
+# Touch Deck
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+Alternative deck for Streamer.bot.
 
-## Recommended IDE Setup
+## Features
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+* Supports pagination
+* Supports actions for both button press and release
+* Includes a built-in server, allowing you to open the client on a mobile device connected to the same Wi-Fi network.
