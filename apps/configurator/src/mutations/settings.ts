@@ -6,6 +6,7 @@ import { invoke } from "@tauri-apps/api/core";
 async function saveSettings(settings: Settings) {
   await store.set("streamerbot", settings.streamerbot);
   await store.set("layout", settings.layout);
+  await store.set("tray", settings.tray);
   await store.save();
 
   invoke("settings_update");

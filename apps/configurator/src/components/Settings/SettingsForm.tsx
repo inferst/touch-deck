@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Form, FormField } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
+import { Checkbox } from "@workspace/ui/components/checkbox";
 import {
   Select,
   SelectContent,
@@ -20,6 +21,7 @@ export type SettingsFormData = {
   endpoint: string;
   rows: number;
   columns: number;
+  tray: boolean;
 };
 
 const schema = z.object({
@@ -28,6 +30,7 @@ const schema = z.object({
   endpoint: z.string(),
   rows: z.number().min(2).max(8),
   columns: z.number().min(2).max(8),
+  tray: z.boolean(),
 });
 
 const columnsArr = [2, 3, 4, 5, 6, 7, 8];
@@ -43,7 +46,7 @@ type SettingsFormProps = {
 
 export function SettingsForm(props: SettingsFormProps) {
   const {
-    data: { host, port, endpoint, rows, columns },
+    data: { host, port, endpoint, rows, columns, tray },
     onImport,
     onExport,
     onSave,
@@ -58,6 +61,7 @@ export function SettingsForm(props: SettingsFormProps) {
       endpoint,
       rows,
       columns,
+      tray,
     },
   });
 
@@ -165,6 +169,25 @@ export function SettingsForm(props: SettingsFormProps) {
                   </Select>
                 )}
               />
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <div className="flex col-end-5 justify-end">
+              <div className="mr-2">System Tray Icon</div>
+              <div className="content-center">
+                <FormField
+                  control={form.control}
+                  name="tray"
+                  render={({ field }) => (
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) => {
+                        return field.onChange(checked);
+                      }}
+                    />
+                  )}
+                />
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">

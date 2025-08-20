@@ -18,7 +18,9 @@ async function getSettings(): Promise<Settings> {
     columns: 5,
   };
 
-  return { streamerbot, layout };
+  const tray: boolean = (await store.get("tray")) ?? false;
+
+  return { streamerbot, layout, tray };
 }
 
 export function useSettingsQuery() {

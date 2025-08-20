@@ -12,4 +12,5 @@ export type LayoutSettings = {
 export type Settings = {
   streamerbot: StreamerbotSettings;
   layout: LayoutSettings;
+  tray: boolean;
 };

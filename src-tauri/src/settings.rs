@@ -49,3 +49,9 @@ pub fn get_streamerbot_settings() -> serde_json::Result<Streamerbot> {
     let streamerbot = from_value(value)?;
     Ok(streamerbot)
 }
+
+pub fn get_tray_value() -> serde_json::Result<bool> {
+    let value = store().get("tray").unwrap_or(Value::Bool(false));
+    let value = from_value(value)?;
+    Ok(value)
+}

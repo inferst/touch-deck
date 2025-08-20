@@ -55,6 +55,7 @@ export function Settings(props: SettingsProps) {
         rows: formData.rows,
         columns: formData.columns,
       },
+      tray: formData.tray,
     });
 
     setIsOpen(false);
@@ -116,6 +117,7 @@ export function Settings(props: SettingsProps) {
     endpoint: settingsQuery.data.streamerbot.endpoint ?? "",
     rows: settingsQuery.data.layout.rows,
     columns: settingsQuery.data.layout.columns,
+    tray: settingsQuery.data.tray,
   };
 
   return (

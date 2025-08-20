@@ -12,11 +12,14 @@ use tauri::{AppHandle, Manager, path::BaseDirectory};
 use tower_http::services::ServeDir;
 use websocket::{client::client, server::handle_socket};
 
+use crate::{settings::get_tray_value, tray::build_tray};
+
 mod commands;
-mod state;
-mod websocket;
-mod settings;
 mod get_ip;
+mod settings;
+mod state;
+mod tray;
+mod websocket;
 
 const PORT: u16 = 3001;
 
@@ -34,7 +37,10 @@ pub fn app_handle<'a>() -> &'a AppHandle {
 #[tokio::main]
 pub async fn run() {
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_positioner::init())
         .setup(|app| {
+            let _ = build_tray(app);
+
             let state = Arc::new(AppState::new());
             let socket_state = state.clone();
 
@@ -45,6 +51,16 @@ pub async fn run() {
 
             Ok(())
         })
+        .on_window_event(|window, event| {
+            let tray_value = get_tray_value().unwrap();
+            if tray_value {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    window.hide().unwrap();
+                }
+            }
+        })
+        .plugin(tauri_plugin_positioner::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
