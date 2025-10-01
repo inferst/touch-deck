@@ -82,8 +82,6 @@ type CommandContentProps = {
 };
 
 function CommandContent(props: CommandContentProps) {
-  console.log('render');
-
   const parentRef = useRef<HTMLDivElement | null>(null);
 
   const { value, items, placeholder, onChange } = props;

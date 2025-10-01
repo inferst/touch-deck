@@ -20,9 +20,10 @@ type DeckCellProps = {
   button?: DeckButton;
   mode: DeckMode;
   actions?: ComboboxItem[];
-  onSave: (button: DeckButton) => void;
+  onSave: (id: number, button: DeckButton) => void;
   onActionStart?: (id: string) => void;
   onActionEnd?: (id: string) => void;
+  onDeckCellDrop?: (id: string) => void;
 };
 
 export function DeckCell(props: DeckCellProps) {
@@ -30,20 +31,20 @@ export function DeckCell(props: DeckCellProps) {
     id,
     width,
     button = {
-      id,
       color: "#3c3c3c",
     },
     mode,
     actions,
     onActionStart,
     onActionEnd,
+    onDeckCellDrop,
     onSave,
   } = props;
 
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSave = (data: DeckFormData) => {
-    onSave({
+    onSave(id, {
       ...button,
       ...data,
     });
@@ -54,7 +55,13 @@ export function DeckCell(props: DeckCellProps) {
   return mode == "edit" ? (
     <Dialog open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <DialogTrigger asChild>
-        <DeckCellButton button={button} width={width} />
+        <DeckCellButton
+          id={id}
+          button={button}
+          width={width}
+          isDnDEnabled={true}
+          onDrop={onDeckCellDrop}
+        />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -70,6 +77,8 @@ export function DeckCell(props: DeckCellProps) {
     </Dialog>
   ) : (
     <DeckCellButton
+      id={id}
+      isActionEnabled={true}
       button={button}
       width={width}
       onStart={onActionStart}

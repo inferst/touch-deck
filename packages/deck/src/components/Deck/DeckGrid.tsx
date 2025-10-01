@@ -49,8 +49,21 @@ export function DeckGrid(props: DeckGridProps) {
     return result;
   }, [rows, columns]);
 
-  const handleSave = (button: DeckButton) => {
-    onSave?.({ ...buttons, [button.id]: button });
+  const handleSave = (id: number, button: DeckButton) => {
+    onSave?.({
+      ...buttons,
+      [id]: button,
+    });
+  };
+
+  const handleDeckCellDrop = (dropId: string, dragId: string) => {
+    const buffer = buttons[dropId];
+
+    onSave?.({
+      ...buttons,
+      [dropId]: buttons[dragId],
+      [dragId]: buffer,
+    });
   };
 
   const handleResize = useCallback(() => {
@@ -103,6 +116,9 @@ export function DeckGrid(props: DeckGridProps) {
                     actions={actions}
                     onActionStart={onActionStart}
                     onActionEnd={onActionEnd}
+                    onDeckCellDrop={(dragId: string) =>
+                      handleDeckCellDrop(id.toString(), dragId)
+                    }
                     onSave={handleSave}
                   />
                 );

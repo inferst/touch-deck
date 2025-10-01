@@ -1,5 +1,4 @@
 export type DeckButton = {
-  id: number;
   title?: string;
   color?: string;
   icon?: string;
@@ -16,4 +15,4 @@ export type DeckPage = {
   buttons: DeckButtons;
 };
 
-export type DeckMode = 'edit' | 'view';
+export type DeckMode = "edit" | "view";
