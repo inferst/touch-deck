@@ -3,7 +3,7 @@ import { Icon } from "@workspace/ui/components/Icon";
 import { cn } from "@workspace/ui/lib/utils";
 import { MinusIcon } from "lucide-react";
 import { IconName } from "lucide-react/dynamic";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type DeckCellButtonProps = {
   id: number;
@@ -33,7 +33,7 @@ export function DeckCellButton(props: DeckCellButtonProps) {
   const [isStarted, setIsStarted] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleStart = (event: React.MouseEvent | React.TouchEvent) => {
+  const handleStart = (event: React.PointerEvent) => {
     if (isActionEnabled) {
       event.preventDefault();
 
@@ -45,7 +45,7 @@ export function DeckCellButton(props: DeckCellButtonProps) {
     }
   };
 
-  const handleEnd = (event: React.MouseEvent | React.TouchEvent) => {
+  const handleEnd = (event: React.PointerEvent) => {
     if (isActionEnabled) {
       event.preventDefault();
 
@@ -95,10 +95,8 @@ export function DeckCellButton(props: DeckCellButtonProps) {
       onDrop={handleDrop}
       key={id}
       onClick={onClick}
-      onMouseDown={handleStart}
-      onTouchStart={handleStart}
-      onMouseUp={handleEnd}
-      onTouchEnd={handleEnd}
+      onPointerDown={handleStart}
+      onPointerUp={handleEnd}
       className={cn(
         isStarted && "scale-110",
         "select-none",
