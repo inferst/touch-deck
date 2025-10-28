@@ -53,6 +53,7 @@ function App() {
       switch (message.name) {
         case "getData": {
           const payload = message.payload as GetDataPayload;
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setData(payload);
         }
       }

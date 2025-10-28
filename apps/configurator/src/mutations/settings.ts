@@ -1,7 +1,7 @@
+import { api } from "@/api";
 import { store } from "@/store";
 import { Settings } from "@/types/settings";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { invoke } from "@tauri-apps/api/core";
 
 async function saveSettings(settings: Settings) {
   await store.set("streamerbot", settings.streamerbot);
@@ -9,7 +9,7 @@ async function saveSettings(settings: Settings) {
   await store.set("tray", settings.tray);
   await store.save();
 
-  invoke("settings_update");
+  api.emitSettingsUpdate();
 }
 
 export function useSettingsMutation() {

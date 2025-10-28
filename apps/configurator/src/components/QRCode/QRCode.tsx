@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core";
+import { api } from "@/api";
 import QRCode from "qrcode";
 import { useEffect, useRef, useState } from "react";
 
@@ -8,8 +8,8 @@ export function QRCodeCanvas() {
   const [url, setUrl] = useState("");
 
   useEffect(() => {
-    invoke("get_deck_url").then((url) => {
-      setUrl(url as string);
+    api.getDeckURL().then((url) => {
+      setUrl(url);
     });
   }, []);
 

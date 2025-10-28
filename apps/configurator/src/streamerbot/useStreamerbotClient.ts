@@ -4,15 +4,21 @@ import {
   StreamerbotClientOptions,
 } from "@streamerbot/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-export function useStreamerbotClient() {
+export type Streamerbot = {
+  client: RefObject<StreamerbotClient | null>,
+  isReady: boolean,
+}
+
+export function useStreamerbotClient(): Streamerbot {
   const { data, isSuccess } = useSettingsQuery();
+
+  const [isReady, setIsReady] = useState(false);
 
   const queryClient = useQueryClient();
 
-  const [streamerbotClient, setStreamerbotClient] =
-    useState<StreamerbotClient>();
+  const streamerbotClient = useRef<StreamerbotClient | null>(null);
 
   const options = useMemo(() => {
     const options: Partial<StreamerbotClientOptions> = {};
@@ -32,15 +38,15 @@ export function useStreamerbotClient() {
     }
 
     return options;
-  }, [data?.streamerbot]);
+  }, [data]);
 
-  function invalidateActions() {
+  const invalidateActions = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["actions"] });
-  }
+  }, [queryClient]);
 
-  function clearActions() {
+  const clearActions = useCallback(() => {
     queryClient.setQueryData(["actions"], () => []);
-  }
+  }, [queryClient]);
 
   useEffect(() => {
     const client = new StreamerbotClient({
@@ -53,10 +59,11 @@ export function useStreamerbotClient() {
       ...options,
     });
 
-    setStreamerbotClient(client);
+    streamerbotClient.current = client;
 
     if (isSuccess) {
       client.connect().then(() => {
+        setIsReady(true);
         invalidateActions();
 
         client.on("Application.ActionAdded", invalidateActions);
@@ -68,7 +75,10 @@ export function useStreamerbotClient() {
     return () => {
       client.disconnect();
     };
-  }, [options, isSuccess]);
+  }, [options, isSuccess, clearActions, invalidateActions]);
 
-  return streamerbotClient;
+  return useMemo(() => ({
+    client: streamerbotClient,
+    isReady,
+  }), [isReady, streamerbotClient]);
 }

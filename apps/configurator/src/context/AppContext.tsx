@@ -1,6 +1,7 @@
-import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { listen, UnlistenFn } from "@tauri-apps/api/event";
+import { isTauri } from "@tauri-apps/api/core";
+import { createContext, useContext, useEffect, useState } from "react";
+import { api } from "@/api";
 
 export type AppState = {
   status: StreamerbotStatus;
@@ -38,25 +39,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   useEffect(() => {
-    const listeners = [
-      listen<AppState>("state_update", (event) => {
-        setState({ ...state, status: event.payload.status });
-      }),
-      listen<ErrorEvent>("error", (event) => {
-        setState({ ...state, error: event.payload.message });
-      }),
-    ];
+    let listeners: Promise<UnlistenFn>[] = [];
 
-    invoke<AppState>("get_state").then((payload) => {
-      setState({ ...state, status: payload.status });
-    });
+    if (isTauri()) {
+      listeners = [
+        listen<AppState>("state_update", (event) => {
+          setState({ ...state, status: event.payload.status });
+        }),
+        listen<ErrorEvent>("error", (event) => {
+          setState({ ...state, error: event.payload.message });
+        }),
+      ];
+
+      api.getStatus().then(status => {
+        setState({ ...state, status });
+      });
+    }
 
     return () => {
       listeners.map((listener) => listener.then((unlisten) => unlisten()));
     };
-  }, []);
+  }, [state]);
 
-  const value = useMemo(() => state, [state]);
-
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+  return <AppContext.Provider value={state}>{children}</AppContext.Provider>;
 };

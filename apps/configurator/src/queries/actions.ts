@@ -14,10 +14,11 @@ async function getActions(streamerbot: StreamerbotClient) {
 
 export function useActionsQuery() {
   const streamerbot = useStreamerbot();
+  const client = streamerbot.client.current;
 
   const query = useQuery({
     queryKey: ["actions"],
-    queryFn: () => (streamerbot ? getActions(streamerbot) : []),
+    queryFn: () => (client ? getActions(client) : []),
   });
 
   return query;
