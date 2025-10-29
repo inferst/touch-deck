@@ -14,23 +14,25 @@ function ConnectionStatus(props: ConnectionStatusProps) {
   };
 
   return (
-    <Button variant={"ghost"} className="m-2">
+    <>
       {context.status == "connected" && (
-        <>
+        <Button variant={"ghost"} className="m-2">
           Connected
           <CheckIcon />
-        </>
+        </Button>
       )}
       {context.status == "connecting" && (
-        <>
+        <Button variant={"ghost"} className="m-2">
           Connecting
           <LoaderCircle className="animate-spin" />
-        </>
+        </Button>
       )}
       {context.status == "disconnected" && (
-        <Button onClick={handleClick}>Try to reconnect</Button>
+        <Button onClick={handleClick} className="m-2">
+          Try to reconnect
+        </Button>
       )}
-    </Button>
+    </>
   );
 }
 
