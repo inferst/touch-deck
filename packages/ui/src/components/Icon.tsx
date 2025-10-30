@@ -6,13 +6,21 @@ type IconName = keyof typeof dynamicIconImports;
 
 const icons = Object.keys(dynamicIconImports) as IconName[];
 
-type ReactComponent = FC<{ className?: string }>;
+type IconProps = {
+  className?: string;
+  color?: string;
+  width?: string | number | undefined;
+  height?: string | number | undefined;
+  size?: string | number | undefined;
+};
+
+type ReactComponent = FC<IconProps>;
 
 const iconComponents = {} as Record<IconName, ReactComponent>;
 
 for (const name of icons) {
-  const NewIcon = () => {
-    return <DynamicIcon name={name} />;
+  const NewIcon = (props: IconProps) => {
+    return <DynamicIcon {...props} name={name} />;
   };
 
   iconComponents[name] = NewIcon;
@@ -20,8 +28,7 @@ for (const name of icons) {
 
 type DynamicIconProps = {
   name: IconName;
-  className?: string;
-};
+} & IconProps;
 
 const Icon = memo(({ name, ...props }: DynamicIconProps) => {
   const Icon = iconComponents[name];

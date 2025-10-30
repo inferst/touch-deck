@@ -121,7 +121,21 @@ export function Settings(props: SettingsProps) {
   };
 
   return (
-    <div className="absolute z-10 flex flex-wrap m-4 left-0 right-0 justify-center">
+    <div
+      className={cn(
+        "absolute",
+        "z-10",
+        "flex",
+        "flex-wrap",
+        "p-4",
+        "left-0",
+        "right-0",
+        "justify-center",
+        "bg-muted",
+        "border-b-1",
+        "border-b-border",
+      )}
+    >
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
           <Button className="m-2">Settings</Button>
