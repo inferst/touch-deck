@@ -83,7 +83,7 @@ export function DeckGrid(props: DeckGridProps) {
             <div
               key={index}
               className={cn(
-                "flex h-[var(--height)]",
+                "flex h-[var(--height)] @container",
               )}
             >
               {row.map((id) => {

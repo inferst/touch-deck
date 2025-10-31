@@ -4,9 +4,9 @@ export function throttle(fn: Function, limit: number) {
   let isThrottle = false;
   return (...args: unknown[]) => {
     if (!isThrottle) {
+      fn(...args);
       isThrottle = true;
       setTimeout(() => {
-        fn(...args);
         isThrottle = false;
       }, limit);
     }

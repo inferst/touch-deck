@@ -3,7 +3,7 @@ import { Icon } from "@workspace/ui/components/Icon";
 import { cn } from "@workspace/ui/lib/utils";
 import { MinusIcon } from "lucide-react";
 import { IconName } from "lucide-react/dynamic";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 type DeckCellButtonProps = {
   id: number;

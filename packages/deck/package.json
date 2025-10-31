@@ -29,6 +29,7 @@
   "exports": {
     "./globals.css": "./src/styles/globals.css",
     "./components/*": "./src/components/*.tsx",
-    "./types/*": "./src/types/*.ts"
+    "./types/*": "./src/types/*.ts",
+    "./utils/*": "./src/utils/*.ts"
   }
 }

@@ -1,10 +1,11 @@
-import { DeckGrid } from "@workspace/deck/components/Deck/DeckGrid";
+import { DeckGrid } from "@workspace/deck/components/NewDeck/DeckGrid";
 import { DeckPage } from "@workspace/deck/types/deck";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonGroup } from "@workspace/ui/components/ButtonGroup";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
+import { DeckPageButton } from "./DeckPageButton";
 
 type Message = {
   name: string;
@@ -53,7 +54,6 @@ function App() {
       switch (message.name) {
         case "getData": {
           const payload = message.payload as GetDataPayload;
-          // eslint-disable-next-line react-hooks/set-state-in-effect
           setData(payload);
         }
       }
@@ -98,12 +98,20 @@ function App() {
             key={page.id}
             rows={data.layout.rows}
             columns={data.layout.columns}
-            buttons={page.buttons}
-            onActionStart={handleAction}
-            onActionEnd={handleAction}
-            mode="view"
             className="flex justify-center items-center h-full grow p-4"
-          />
+          >
+            {(id) => (
+              <DeckPageButton
+                key={id}
+                id={id}
+                width={100 / data.layout.columns}
+                height={100 / data.layout.rows}
+                button={page.buttons[id]}
+                onPointerDown={handleAction}
+                onPointerUp={handleAction}
+              />
+            )}
+          </DeckGrid>
         )}
       </div>
       {data.pages.length > 1 && (

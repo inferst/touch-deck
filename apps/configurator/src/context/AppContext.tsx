@@ -44,22 +44,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     if (isTauri()) {
       listeners = [
         listen<AppState>("state_update", (event) => {
-          setState({ ...state, status: event.payload.status });
+          setState((state) => ({ ...state, status: event.payload.status }));
         }),
         listen<ErrorEvent>("error", (event) => {
-          setState({ ...state, error: event.payload.message });
+          setState((state) => ({ ...state, error: event.payload.message }));
         }),
       ];
 
-      api.getStatus().then(status => {
-        setState({ ...state, status });
+      api.getStatus().then((status) => {
+        setState((state) => ({ ...state, status }));
       });
     }
 
     return () => {
       listeners.map((listener) => listener.then((unlisten) => unlisten()));
     };
-  }, [state]);
+  }, []);
 
   return <AppContext.Provider value={state}>{children}</AppContext.Provider>;
 };
