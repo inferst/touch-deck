@@ -23,7 +23,6 @@ export function QRCodeCanvas() {
         },
         function (error) {
           if (error) console.error(error);
-          console.log("success!");
         },
       );
     }

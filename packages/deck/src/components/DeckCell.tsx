@@ -13,9 +13,8 @@ type FontSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 type Align = "bottom" | "middle" | "top";
 
-type DeckCellButtonProps = {
+type DeckCellProps = {
   ref?: RefObject<HTMLDivElement | null>;
-  id: number;
   width: number;
   height: number;
   icon?: string;
@@ -34,10 +33,9 @@ type DeckCellButtonProps = {
   onPointerUp?: (event: React.PointerEvent) => void;
 };
 
-export function DeckCellButton(props: DeckCellButtonProps) {
+export function DeckCell(props: DeckCellProps) {
   const {
     ref,
-    id,
     width,
     height,
     icon,
@@ -98,7 +96,6 @@ export function DeckCellButton(props: DeckCellButtonProps) {
   return (
     <div
       ref={ref}
-      key={id}
       onClick={onClick}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}

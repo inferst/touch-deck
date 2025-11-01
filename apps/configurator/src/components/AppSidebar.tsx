@@ -33,7 +33,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           groups[action.group] = [];
         }
 
-        groups[action.group].push(action);
+        groups[action.group]?.push(action);
 
         return groups;
       }, {});
@@ -48,9 +48,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const filtered: Groups = {};
 
     for (const group in actions) {
-      const groupActions = actions[group].filter((action) =>
+      const groupActions = actions[group]?.filter((action) =>
         action.name.toLowerCase().includes(search.toLowerCase()),
-      );
+      ) ?? [];
 
       if (groupActions.length > 0) {
         filtered[group] = groupActions;

@@ -1,6 +1,7 @@
 import { useThrottle } from "@workspace/deck/utils/throttle";
 import { cn } from "@workspace/ui/lib/utils";
 import {
+  memo,
   ReactNode,
   useCallback,
   useEffect,
@@ -10,13 +11,13 @@ import {
 } from "react";
 
 type DeckGridProps = {
-  children: (id: number) => ReactNode;
+  children: (row: number, col: number) => ReactNode;
   rows: number;
   columns: number;
   className?: string;
 };
 
-export function DeckGrid(props: DeckGridProps) {
+export const DeckGrid = memo((props: DeckGridProps) => {
   const { children, rows, columns, className } = props;
 
   const [screenRatio, setScreenRatio] = useState(1);
@@ -26,14 +27,14 @@ export function DeckGrid(props: DeckGridProps) {
   const grid = useMemo(() => {
     const result = [];
 
-    for (let row = 0; row < rows; row++) {
-      const rowArray = [];
+    for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
+      const row = [];
 
       for (let column = 0; column < columns; column++) {
-        rowArray.push(row * columns + column);
+        row.push(column);
       }
 
-      result.push(rowArray);
+      result.push(row);
     }
 
     return result;
@@ -53,7 +54,7 @@ export function DeckGrid(props: DeckGridProps) {
   const throttledUpdateScreenRatio = useThrottle(updateScreenRatio, 500);
 
   useEffect(() => {
-    throttledUpdateScreenRatio();
+    updateScreenRatio();
 
     window.addEventListener("resize", throttledUpdateScreenRatio);
 
@@ -78,16 +79,14 @@ export function DeckGrid(props: DeckGridProps) {
           } as React.CSSProperties
         }
       >
-        {grid.map((row, index) => {
+        {grid.map((row, rowIndex) => {
           return (
             <div
-              key={index}
-              className={cn(
-                "flex h-[var(--height)] @container",
-              )}
+              key={rowIndex}
+              className={cn("flex h-[var(--height)] @container")}
             >
-              {row.map((id) => {
-                return children(id);
+              {row.map((colIndex) => {
+                return children(rowIndex, colIndex);
               })}
             </div>
           );
@@ -95,4 +94,4 @@ export function DeckGrid(props: DeckGridProps) {
       </div>
     </div>
   );
-}
+});

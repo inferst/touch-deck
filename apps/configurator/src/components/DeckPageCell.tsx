@@ -5,12 +5,9 @@ import {
   dropTargetForElements,
 } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { DeckCellButton } from "@workspace/deck/components/NewDeck/DeckCellButton";
-import {
-  DeckForm,
-  DeckFormData,
-} from "@workspace/deck/components/NewDeck/DeckForm";
-import { DeckButton } from "@workspace/deck/types/deck";
+import { DeckCell } from "@workspace/deck/components/DeckCell";
+import { DeckForm, DeckFormData } from "@workspace/deck/components/DeckForm";
+import { Cell } from "@workspace/deck/types";
 import { ComboboxItem } from "@workspace/ui/components/Combobox";
 import {
   Dialog,
@@ -22,16 +19,15 @@ import {
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 
 type DeckPageButtonProps = {
-  id: number;
   width: number;
   height: number;
-  button?: DeckButton;
+  cell: Cell;
   actions?: ComboboxItem[];
-  onSave: (id: number, button: DeckButton) => void;
+  onSave: (cell: Cell) => void;
 };
 
-export function DeckPageButton(props: DeckPageButtonProps) {
-  const { id, width, height, button = {}, actions, onSave } = props;
+export function DeckPageCell(props: DeckPageButtonProps) {
+  const { width, height, cell, actions, onSave } = props;
 
   const [isOpen, setIsOpen] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -39,8 +35,8 @@ export function DeckPageButton(props: DeckPageButtonProps) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   const handleSave = (data: DeckFormData) => {
-    onSave(id, {
-      ...button,
+    onSave({
+      ...cell,
       ...data,
     });
 
@@ -59,22 +55,22 @@ export function DeckPageButton(props: DeckPageButtonProps) {
     return combine(
       draggable({
         element: el,
-        getInitialData: () => ({ type: "cell", id, instanceId }),
+        getInitialData: () => ({ type: "cell", id: cell.id, instanceId }),
       }),
       dropTargetForElements({
         element: el,
-        getData: () => ({ id }),
+        getData: () => ({ id: cell.id }),
         getIsSticky: () => false,
         canDrop: ({ source }) =>
           source.data.instanceId === instanceId &&
           source.data.type === "cell" &&
-          source.data.id !== id,
+          source.data.id !== cell.id,
         onDragEnter: () => setIsDragOver(true),
         onDragLeave: () => setIsDragOver(false),
         onDrop: () => setIsDragOver(false),
       }),
     );
-  }, [instanceId, id]);
+  }, [instanceId, cell.id]);
 
   const borderColor = useMemo(
     () => (isDragOver ? "#fff" : undefined),
@@ -84,12 +80,11 @@ export function DeckPageButton(props: DeckPageButtonProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <DialogTrigger asChild>
-        <DeckCellButton
+        <DeckCell
           ref={ref}
-          id={id}
-          text={button.title}
-          icon={button.icon}
-          backgroundColor={button.color}
+          text={cell?.title}
+          icon={cell?.icon}
+          backgroundColor={cell?.color}
           borderColor={borderColor}
           width={width}
           height={height}
@@ -101,7 +96,7 @@ export function DeckPageButton(props: DeckPageButtonProps) {
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <DeckForm
-          data={button}
+          data={cell}
           actions={actions}
           onSave={handleSave}
           onCancel={() => {}}

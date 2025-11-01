@@ -1,17 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Combobox,
-  ComboboxItem,
-} from "@workspace/ui/components/Combobox";
-
-import {
-  VirtualizedCombobox,
-} from "@workspace/ui/components/VirtualizedCombobox";
-import { Icon, icons } from "@workspace/ui/components/Icon";
+import { Combobox, ComboboxItem } from "@workspace/ui/components/Combobox";
 import { Form, FormField } from "@workspace/ui/components/form";
+import { Icon, icons } from "@workspace/ui/components/Icon";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
+import { VirtualizedCombobox } from "@workspace/ui/components/VirtualizedCombobox";
 import { XIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -23,6 +17,7 @@ const iconItems = icons.map((icon) => ({
 }));
 
 export type DeckFormData = {
+  id: string;
   title?: string;
   color?: string;
   icon?: string;
@@ -31,6 +26,7 @@ export type DeckFormData = {
 };
 
 const schema = z.object({
+  id: z.string(),
   title: z.string().optional(),
   color: z.string().optional(),
   icon: z.string().optional(),
@@ -51,6 +47,14 @@ export function DeckForm(props: DeckFormProps) {
   const form = useForm<DeckFormData>({
     resolver: zodResolver(schema),
     values: data,
+    defaultValues: {
+      id: crypto.randomUUID(),
+      title: "",
+      color: "#111",
+      icon: "",
+      startActionId: "",
+      endActionId: "",
+    },
   });
 
   const handleSubmit = (data: DeckFormData) => {

@@ -23,7 +23,7 @@ function Pages(props: PagesProps) {
         ...deckQuery.data.pages,
         {
           id: crypto.randomUUID(),
-          buttons: {},
+          board: {},
         },
       ],
     });
@@ -34,7 +34,7 @@ function Pages(props: PagesProps) {
   };
 
   const handleDelete = () => {
-    const id = deckQuery.data.pages[props.selectedPageNumber].id;
+    const id = deckQuery.data?.pages[props.selectedPageNumber]?.id;
 
     if (id) {
       deckMutation.mutate({
