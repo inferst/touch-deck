@@ -2,11 +2,13 @@ import { useEffect, useMemo, useRef } from "react";
 
 export function throttle(fn: Function, limit: number) {
   let isThrottle = false;
+  let latestArgs: unknown[];
   return (...args: unknown[]) => {
+    latestArgs = args;
     if (!isThrottle) {
-      fn(...args);
       isThrottle = true;
       setTimeout(() => {
+        fn(...latestArgs);
         isThrottle = false;
       }, limit);
     }
@@ -21,8 +23,8 @@ export function useThrottle(fn: Function, limit: number) {
   }, [fn]);
 
   const throttledCallback = useMemo(() => {
-    const func = () => {
-      ref.current?.();
+    const func = (...args: any[]) => {
+      ref.current?.(...args);
     };
 
     return throttle(func, limit);

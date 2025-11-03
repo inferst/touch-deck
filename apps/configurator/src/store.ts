@@ -1,7 +1,15 @@
 import { isTauri } from "@tauri-apps/api/core";
 import { LazyStore } from "@tauri-apps/plugin-store";
 
-class LocalStoreAdapter {
+interface IStoreAdapter {
+  get<T>(key: string): Promise<T | undefined>;
+
+  set(key: string, value: unknown): Promise<void>;
+
+  save(): Promise<void>;
+}
+
+class LocalStoreAdapter implements IStoreAdapter {
   constructor(private readonly store: Storage) {}
 
   get<T>(key: string): Promise<T | undefined> {
@@ -23,7 +31,7 @@ class LocalStoreAdapter {
   }
 }
 
-class TauriStoreAdapter {
+class TauriStoreAdapter implements IStoreAdapter {
   constructor(private readonly store: LazyStore) {}
 
   get<T>(key: string): Promise<T | undefined> {
@@ -39,7 +47,7 @@ class TauriStoreAdapter {
   }
 }
 
-function createStore(isTauri: boolean) {
+function createStore(isTauri: boolean): IStoreAdapter {
   if (isTauri) {
     const store = new LazyStore("settings.json");
     return new TauriStoreAdapter(store);

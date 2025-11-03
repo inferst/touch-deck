@@ -1,10 +1,10 @@
-import { getCell } from "@workspace/deck/board";
+import { generateBoard, getCell } from "@workspace/deck/board";
 import { DeckGrid } from "@workspace/deck/components/DeckGrid";
-import { Page } from "@workspace/deck/types";
+import { DeckSettings, DeckSettingsSchema, Deck as DeckType } from "@workspace/deck/types/board";
 import { Button } from "@workspace/ui/components/button";
-import { ButtonGroup } from "@workspace/ui/components/ButtonGroup";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ButtonGroup } from "@workspace/ui/components/button-group";
+import { ChevronDown, ChevronUp, FullscreenIcon } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import { DeckCell } from "./DeckCell";
 
@@ -13,18 +13,15 @@ type Message = {
   payload: unknown;
 };
 
-type LayoutSettings = {
-  rows: number;
-  columns: number;
-};
-
 type GetDataPayload = {
-  pages: Page[];
-  layout: LayoutSettings;
+  deck: DeckType;
+  settings: DeckSettings;
 };
 
 function Deck() {
   const [pageNumber, setPageNumber] = useState(0);
+
+  const ref = useRef<HTMLDivElement | null>(null);
 
   const { lastJsonMessage, sendJsonMessage } = useWebSocket(
     `ws://${location.hostname}:3001/ws`,
@@ -35,11 +32,8 @@ function Deck() {
   );
 
   const [data, setData] = useState<GetDataPayload>({
-    pages: [],
-    layout: {
-      rows: 0,
-      columns: 0,
-    },
+    deck: { pages: [] },
+    settings: DeckSettingsSchema.parse({}),
   });
 
   useEffect(() => {
@@ -55,6 +49,7 @@ function Deck() {
       switch (message.name) {
         case "getData": {
           const payload = message.payload as GetDataPayload;
+          console.log(payload);
           setData(payload);
         }
       }
@@ -70,46 +65,69 @@ function Deck() {
     });
   };
 
-  const page = data.pages[pageNumber];
+  const page = data.deck.pages[pageNumber];
+
+  const layout = data.settings.layout;
+
+  const pageBoard = useMemo(
+    () => generateBoard(layout.rows, layout.columns, page?.board ?? {}),
+    [layout, page],
+  );
 
   const handlePrevPageClick = () => {
-    const prevPage = pageNumber - 1;
-
-    if (prevPage >= 0) {
-      setPageNumber(prevPage);
-    }
+    setPageNumber((pageNumber) => {
+      const prevPage =
+        pageNumber - 1 >= 0 ? pageNumber - 1 : data.deck.pages.length - 1;
+      return prevPage;
+    });
   };
 
   const handleNextPageClick = () => {
-    const nextPage = pageNumber + 1;
+    setPageNumber((pageNumber) => {
+      const nextPage = (pageNumber + 1) % data.deck.pages.length;
+      return nextPage;
+    });
+  };
 
-    if (nextPage > 0 && nextPage < data.pages.length) {
-      setPageNumber(nextPage);
+  const handleFullscreen = () => {
+    if (ref.current) {
+      if (!document.fullscreenElement) {
+        ref.current.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
     }
   };
 
-  const isPrevPageAvailable = pageNumber > 0;
-  const isNextPageAvailable = pageNumber < data.pages.length - 1;
+  const hasFullscreenButton = document.fullscreenEnabled;
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <div className="w-full">
+    <div
+      ref={ref}
+      style={
+        {
+          paddingLeft: "env(safe-area-inset-left)",
+          paddingRight: "env(safe-area-inset-right)",
+        } as React.CSSProperties
+      }
+      className="w-full flex h-dvh overflow-hidden select-none"
+    >
+      <div className="w-full bg-background">
         {page && (
           <DeckGrid
             key={page.id}
-            rows={data.layout.rows}
-            columns={data.layout.columns}
+            rows={layout.rows}
+            columns={layout.columns}
+            spacing={data.settings.style.spacing}
             className="flex justify-center items-center h-full grow p-4"
           >
             {(row, col) => {
-              const cell = getCell(page.board, row, col);
+              const cell = getCell(pageBoard, row, col);
               return (
                 cell && (
                   <DeckCell
-                    key={cell.id}
-                    width={100 / data.layout.columns}
-                    height={100 / data.layout.rows}
                     cell={cell}
+                    borderRadius={data.settings.style.borderRadius}
                     onPointerDown={handleAction}
                     onPointerUp={handleAction}
                   />
@@ -119,23 +137,33 @@ function Deck() {
           </DeckGrid>
         )}
       </div>
-      {data.pages.length > 1 && (
-        <div className="flex justify-center items-center mr-4">
+      {data.deck.pages.length > 1 && (
+        <div className="flex relative justify-center items-center px-6 border-l-2 border-border bg-muted">
+          {hasFullscreenButton && (
+            <Button
+              className="absolute top-4"
+              variant={"secondary"}
+              size={"icon"}
+              onPointerDown={handleFullscreen}
+            >
+              <FullscreenIcon />
+            </Button>
+          )}
           <ButtonGroup orientation="vertical">
             <Button
-              disabled={!isNextPageAvailable}
-              onClick={handleNextPageClick}
-              className="size-14"
+              onPointerDown={handleNextPageClick}
+              variant={"secondary"}
+              className="size-12 rounded-2xl"
             >
               <ChevronUp className="size-10" />
             </Button>
-            <Button variant={"secondary"} className="size-14 text-2xl">
+            <Button variant={"outline"} className="size-12 text-2xl">
               {pageNumber + 1}
             </Button>
             <Button
-              disabled={!isPrevPageAvailable}
-              onClick={handlePrevPageClick}
-              className="size-14"
+              onPointerDown={handlePrevPageClick}
+              variant={"secondary"}
+              className="size-12 rounded-2xl"
             >
               <ChevronDown className="size-10" />
             </Button>

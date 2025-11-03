@@ -29,7 +29,7 @@ async fn connect_and_rerun(sender: Sender<SBMessage>, abort_rx: Sender<()>) {
         }
 
         println!("Trying to reconnect...");
-        sleep(Duration::from_secs(5)).await;
+        sleep(Duration::from_secs(500)).await;
     }
 }
 

@@ -1,12 +1,13 @@
 import { useAppContext } from "@/context/AppContext";
 import { Button } from "@workspace/ui/components/button";
 import { CheckIcon, LoaderCircle } from "lucide-react";
+import { memo } from "react";
 
 type ConnectionStatusProps = {
   onTryToReconnect?: () => void;
 };
 
-function ConnectionStatus(props: ConnectionStatusProps) {
+export const ConnectionStatus = memo((props: ConnectionStatusProps) => {
   const context = useAppContext();
 
   const handleClick = () => {
@@ -34,6 +35,4 @@ function ConnectionStatus(props: ConnectionStatusProps) {
       )}
     </>
   );
-}
-
-export { ConnectionStatus };
+});

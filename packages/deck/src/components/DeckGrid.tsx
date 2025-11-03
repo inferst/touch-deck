@@ -1,10 +1,12 @@
+import { DeckGridContext } from "@workspace/deck/components/DeckContext";
+import { Spacing } from "@workspace/deck/types/board";
 import { useThrottle } from "@workspace/deck/utils/throttle";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   memo,
   ReactNode,
   useCallback,
-  useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -14,15 +16,19 @@ type DeckGridProps = {
   children: (row: number, col: number) => ReactNode;
   rows: number;
   columns: number;
+  spacing?: Spacing;
   className?: string;
 };
 
 export const DeckGrid = memo((props: DeckGridProps) => {
-  const { children, rows, columns, className } = props;
+  const { children, rows, columns, spacing = 0, className } = props;
 
   const [screenRatio, setScreenRatio] = useState(1);
+  const [cellBorderWidth, setCellBorderWidth] = useState(0);
+  const [cellSpacing, setCellSpacing] = useState(0);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   const grid = useMemo(() => {
     const result = [];
@@ -40,58 +46,95 @@ export const DeckGrid = memo((props: DeckGridProps) => {
     return result;
   }, [rows, columns]);
 
-  const updateScreenRatio = useCallback(() => {
-    const container = containerRef.current;
-
-    if (container) {
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-
-      setScreenRatio(width / height);
-    }
+  const calculateScreenRatio = useCallback((entry: ResizeObserverEntry) => {
+    const containerWidth = entry.contentRect.width;
+    const containerHeight = entry.contentRect.height;
+    setScreenRatio(containerWidth / containerHeight);
+    console.log("screenRatio", containerWidth, containerHeight);
   }, []);
 
-  const throttledUpdateScreenRatio = useThrottle(updateScreenRatio, 500);
+  useLayoutEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (wrapper) {
+      const cellWidth = wrapper.clientWidth / columns;
+      setCellBorderWidth(Math.round((cellWidth * 2) / 100));
+      setCellSpacing(Math.round((spacing * (cellWidth * 2)) / 100));
+    }
+  }, [screenRatio, columns, rows, spacing]);
 
-  useEffect(() => {
-    updateScreenRatio();
+  const throttledCalculateScreenRatio = useThrottle(calculateScreenRatio, 0);
 
-    window.addEventListener("resize", throttledUpdateScreenRatio);
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    setScreenRatio(containerWidth / containerHeight);
+
+    const reszeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        throttledCalculateScreenRatio(entry);
+      }
+    });
+
+    reszeObserver.observe(container);
 
     return () => {
-      window.removeEventListener("resize", throttledUpdateScreenRatio);
+      reszeObserver.unobserve(container);
     };
-  }, [rows, columns, updateScreenRatio]);
+  }, [throttledCalculateScreenRatio]);
+
+  const contextValue = useMemo(
+    () => ({ borderWidth: cellBorderWidth }),
+    [cellBorderWidth],
+  );
+
+  console.log("DeckGrid render");
 
   return (
-    <div ref={containerRef} className={className}>
-      <div
-        className={cn(
-          "flex",
-          "flex-col",
-          "aspect-[var(--aspectRatio)]",
-          screenRatio < columns / rows ? "w-full" : "h-full",
-        )}
-        style={
-          {
-            "--aspectRatio": `${columns} / ${rows}`,
-            "--height": `${100 / rows}%`,
-          } as React.CSSProperties
-        }
-      >
-        {grid.map((row, rowIndex) => {
-          return (
-            <div
-              key={rowIndex}
-              className={cn("flex h-[var(--height)] @container")}
-            >
-              {row.map((colIndex) => {
-                return children(rowIndex, colIndex);
-              })}
-            </div>
-          );
-        })}
+    <DeckGridContext.Provider value={contextValue}>
+      <div ref={containerRef} className={cn(className, "@container")}>
+        <div
+          ref={wrapperRef}
+          className={cn(
+            "flex",
+            "flex-col",
+            "aspect-(--aspect-ratio)",
+            screenRatio < columns / rows ? "w-full" : "h-full",
+          )}
+          style={
+            {
+              "--aspect-ratio": `${columns} / ${rows}`,
+              "--width": `${100 / columns}%`,
+              "--height": `${100 / rows}%`,
+              "--spacing": `${cellSpacing}px`,
+            } as React.CSSProperties
+          }
+        >
+          {grid.map((row, rowIndex) => {
+            return (
+              <div
+                key={rowIndex}
+                className={cn("flex h-(--height) @container")}
+              >
+                {row.map((colIndex) => {
+                  return (
+                    <div
+                      key={colIndex}
+                      className={cn("w-(--width) m-(--spacing)")}
+                    >
+                      {children(rowIndex, colIndex)}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </DeckGridContext.Provider>
   );
 });

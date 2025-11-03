@@ -1,7 +1,7 @@
 import { api } from "@/api";
 import { store } from "@/store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Deck } from "@workspace/deck/types";
+import { Deck } from "@workspace/deck/types/board";
 
 async function saveDeck(data: Deck) {
   await store.set("deck", data);

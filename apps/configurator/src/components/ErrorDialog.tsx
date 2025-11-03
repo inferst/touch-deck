@@ -8,8 +8,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@workspace/ui/components/alert-dialog";
+import { memo } from "react";
 
-export function ErrorDialog() {
+export const ErrorDialog = memo(() => {
   const context = useAppContext();
 
   return (
@@ -27,4 +28,4 @@ export function ErrorDialog() {
       </AlertDialog>
     )
   );
-}
+});

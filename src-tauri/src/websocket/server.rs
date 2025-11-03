@@ -12,7 +12,7 @@ use std::sync::Arc;
 use tokio::sync::{Mutex, broadcast::Sender};
 
 use crate::{
-    settings::{get_layout, get_pages},
+    settings::{get_deck, get_layout, get_pages, get_settings},
     state::{AppState, SBMessage, ServerMessage},
 };
 
@@ -70,8 +70,8 @@ async fn get_data(socket: Arc<Mutex<SplitSink<WebSocket, Message>>>) {
     let response = json!({
         "name": "getData",
         "payload": {
-            "pages": get_pages(),
-            "layout": get_layout(),
+            "deck": get_deck(),
+            "settings": get_settings(),
         }
     });
 

@@ -9,6 +9,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@supports(padding:max(0px)) {
+    body, header, footer {
+        padding-left: min(0vmin, env(safe-area-inset-left));
+        padding-right: min(0vmin, env(safe-area-inset-right));
+    }
+}
+
 @layer base {
   :root {
     --background: hsl(334 62% 100%);
@@ -109,7 +116,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-muted text-foreground;
   }
 }
 

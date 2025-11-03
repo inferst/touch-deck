@@ -70,7 +70,7 @@ class LocalAPI implements API {
   }
 }
 
-function createApi(isTauri: boolean) {
+function createApi(isTauri: boolean): API {
   if (isTauri) {
     return new TauriAPI();
   } else {

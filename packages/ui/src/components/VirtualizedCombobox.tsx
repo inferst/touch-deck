@@ -86,29 +86,32 @@ function CommandContent(props: CommandContentProps) {
 
   const { value, items, placeholder, onChange } = props;
 
+  const [search, setSearh] = React.useState("");
+
+  const filteredItems = React.useMemo(() => {
+    return items.filter((item) => item.label.includes(search));
+  }, [search, items]);
+
   const rowVirtualizer = useVirtualizer({
-    count: items.length,
+    count: filteredItems.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 35,
   });
 
+  const handleInput = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearh(event.target.value);
+    },
+    [],
+  );
+
   return (
-    <Command
-      filter={(_, search, keywords) => {
-        const value = keywords?.map((word) => word.toLowerCase()).join(" ");
-
-        if (value?.includes(search.toLowerCase())) {
-          return 1;
-        }
-
-        return 0;
-      }}
-    >
-      <CommandInput placeholder={placeholder} />
+    <Command>
+      <CommandInput onInput={handleInput} placeholder={placeholder} />
       <CommandList
         ref={parentRef}
         style={{
-          height: "300px",
+          height: "200px",
           width: "100%",
           overflow: "auto",
         }}
@@ -124,9 +127,9 @@ function CommandContent(props: CommandContentProps) {
           >
             {rowVirtualizer.getVirtualItems().map((virtualItem) => (
               <CommandItem
-                key={items[virtualItem.index]!.value}
-                value={items[virtualItem.index]!.value}
-                keywords={[items[virtualItem.index]!.label]}
+                key={filteredItems[virtualItem.index]!.value}
+                value={filteredItems[virtualItem.index]!.value}
+                keywords={[filteredItems[virtualItem.index]!.label]}
                 onSelect={(currentValue) => {
                   onChange(currentValue);
                 }}
@@ -139,12 +142,12 @@ function CommandContent(props: CommandContentProps) {
                   transform: `translateY(${virtualItem.start}px)`,
                 }}
               >
-                {items[virtualItem.index]!.icon}
-                {items[virtualItem.index]!.label}
+                {filteredItems[virtualItem.index]!.icon}
+                {filteredItems[virtualItem.index]!.label}
                 <Check
                   className={cn(
                     "ml-2 h-4 w-4",
-                    value === items[virtualItem.index]!.value
+                    value === filteredItems[virtualItem.index]!.value
                       ? "opacity-100"
                       : "opacity-0",
                   )}

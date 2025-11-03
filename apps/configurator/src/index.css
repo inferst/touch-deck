@@ -9,42 +9,46 @@
 
 @custom-variant dark (&:is(.dark *));
 
+body {
+  overflow: hidden;
+}
+
 .theme-custom {
-    /* Name: custom color palette
+  /* Name: custom color palette
        Author: Ilias Ism
        URL: https://gradient.page */
 
-    /* CSS: .bg-gradient { background: var(--gradient) } */
-    --gradient: #0582ca;
+  /* CSS: .bg-gradient { background: var(--gradient) } */
+  --gradient: #0582ca;
 
-    --background: 215 61.75% 3.28%;
-    --foreground: 215 9.5% 97.05%;
+  --background: 215 61.75% 3.28%;
+  --foreground: 215 9.5% 97.05%;
 
-    --muted: 215 47.5% 12.299999999999999%;
-    --muted-foreground: 215 9.5% 54.1%;
+  --muted: 215 47.5% 12.299999999999999%;
+  --muted-foreground: 215 9.5% 54.1%;
 
-    --popover: 215 46% 5.33%;
-    --popover-foreground: 215 9.5% 97.05%;
+  --popover: 215 46% 5.33%;
+  --popover-foreground: 215 9.5% 97.05%;
 
-    --card: 215 46% 5.33%;
-    --card-foreground: 215 9.5% 97.05%;
+  --card: 215 46% 5.33%;
+  --card-foreground: 215 9.5% 97.05%;
 
-    --border: 215 47.5% 12.299999999999999%;
-    --input: 215 47.5% 12.299999999999999%;
+  --border: 215 47.5% 12.299999999999999%;
+  --input: 215 47.5% 12.299999999999999%;
 
-    --primary: 215 95% 41%;
-    --primary-foreground: 215 9.5% 97.05%;
+  --primary: 215 95% 41%;
+  --primary-foreground: 215 9.5% 97.05%;
 
-    --secondary: 215 47.5% 12.299999999999999%;
-    --secondary-foreground: 215 9.5% 97.05%;
+  --secondary: 215 47.5% 12.299999999999999%;
+  --secondary-foreground: 215 9.5% 97.05%;
 
-    --accent: 215 47.5% 12.299999999999999%;
-    --accent-foreground: 215 9.5% 97.05%;
+  --accent: 215 47.5% 12.299999999999999%;
+  --accent-foreground: 215 9.5% 97.05%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 215 9.5% 97.05%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 215 9.5% 97.05%;
 
-    --ring: 215 95% 41%;
+  --ring: 215 95% 41%;
 }
 
 @layer base {

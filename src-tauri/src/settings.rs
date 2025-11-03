@@ -34,6 +34,14 @@ pub fn default_endpoint() -> String {
     "/".to_string()
 }
 
+pub fn get_deck() -> Value {
+    store().get("deck").unwrap()
+}
+
+pub fn get_settings() -> Value {
+    store().get("settings").unwrap()
+}
+
 pub fn get_pages() -> Value {
     store().get("pages").unwrap()
 }
@@ -44,7 +52,7 @@ pub fn get_layout() -> Value {
 
 pub fn get_streamerbot_settings() -> serde_json::Result<Streamerbot> {
     let value = store()
-        .get("streamerbot")
+        .get("settings")
         .unwrap_or(Value::Object(Map::new()));
     let streamerbot = from_value(value)?;
     Ok(streamerbot)

@@ -1,8 +1,8 @@
 import { api } from "@/api";
 import QRCode from "qrcode";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
-export function QRCodeCanvas() {
+export const QRCodeCanvas = memo(() => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   const [url, setUrl] = useState("");
@@ -39,4 +39,4 @@ export function QRCodeCanvas() {
       </div>
     </div>
   );
-}
+});

@@ -7,14 +7,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
+import { memo } from "react";
 import { QRCodeCanvas } from "./QRCode/QRCode";
+import { cn } from "@workspace/ui/lib/utils";
 
-export function Footer() {
+export const Footer = memo(() => {
   return (
-    <div className="absolute z-10 flex flex-wrap m-4 left-0 right-0 bottom-0 justify-center">
+    <div
+      className={cn(
+        "absolute z-10 flex flex-wrap p-4 left-0 right-0 bottom-0",
+        "border-t-2",
+        "border-t-border",
+      )}
+    >
       <Dialog>
         <DialogTrigger asChild>
-          <Button className="m-2">Open Deck</Button>
+          <Button>Open Deck</Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
@@ -30,4 +38,4 @@ export function Footer() {
       </Dialog>
     </div>
   );
-}
+});

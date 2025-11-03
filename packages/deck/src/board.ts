@@ -1,4 +1,5 @@
-import { Cell, Board, Row, Deck } from "@workspace/deck/types";
+import { Board, Cell, Row } from "@workspace/deck/types/board";
+import { nanoid } from "nanoid";
 
 export function generateBoard(
   rows: number,
@@ -13,7 +14,9 @@ export function generateBoard(
 
     for (let colIndex = 0; colIndex < cols; colIndex++) {
       row[colIndex] = {
-        ...(row[colIndex] ?? { id: crypto.randomUUID() }),
+        ...(row[colIndex] ?? {
+          id: crypto && crypto.randomUUID ? crypto.randomUUID() : nanoid(),
+        }),
       };
     }
   }
@@ -78,15 +81,4 @@ export function setCellById(board: Board, cell: Cell): Board {
   }
 
   return board;
-}
-
-export function defaultDeck(): Deck {
-  return {
-    pages: [
-      {
-        id: crypto.randomUUID(),
-        board: {},
-      },
-    ],
-  };
 }

@@ -23,7 +23,7 @@ export type ComboboxItem = {
   icon?: JSX.Element;
 };
 
-type ComboboxProps = {
+export type ComboboxProps = {
   value?: string;
   items: ComboboxItem[];
   placeholder: string;

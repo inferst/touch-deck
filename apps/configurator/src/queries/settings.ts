@@ -1,32 +1,25 @@
 import { store } from "@/store";
-import {
-  LayoutSettings,
-  Settings,
-  StreamerbotSettings,
-} from "@/types/settings";
 import { useQuery } from "@tanstack/react-query";
+import { DeckSettings } from "@workspace/deck/types/board";
+import { DeckSettingsDefaultSchema } from "@workspace/deck/schema/settings";
 
-async function getSettings(): Promise<Settings> {
-  const streamerbot: StreamerbotSettings = (await store.get("streamerbot")) ?? {
-    host: "",
-    port: 8080,
-    endpoint: "",
-  };
+async function getSettings(): Promise<DeckSettings> {
+  const settings = (await store.get("settings")) ?? {};
 
-  const layout: LayoutSettings = (await store.get("layout")) ?? {
-    rows: 3,
-    columns: 5,
-  };
-
-  const tray: boolean = (await store.get("tray")) ?? false;
-
-  return { streamerbot, layout, tray };
+  try {
+    const parsed = DeckSettingsDefaultSchema.parse(settings);
+    return parsed;
+  } catch (error) {
+    console.error("Missing default fields", error);
+    throw error;
+  }
 }
 
 export function useSettingsQuery() {
   const query = useQuery({
     queryKey: ["settings"],
     queryFn: () => getSettings(),
+    throwOnError: true,
   });
 
   return query;

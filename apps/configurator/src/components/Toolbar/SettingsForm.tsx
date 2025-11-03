@@ -14,6 +14,7 @@ import {
 import { XIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { memo } from "react";
 
 export type SettingsFormData = {
   host: string;
@@ -44,7 +45,7 @@ type SettingsFormProps = {
   onCancel: () => void;
 };
 
-export function SettingsForm(props: SettingsFormProps) {
+export const SettingsForm = memo((props: SettingsFormProps) => {
   const {
     data: { host, port, endpoint, rows, columns, tray },
     onImport,
@@ -220,4 +221,4 @@ export function SettingsForm(props: SettingsFormProps) {
       </form>
     </Form>
   );
-}
+});

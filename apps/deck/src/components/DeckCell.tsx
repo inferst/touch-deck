@@ -1,36 +1,36 @@
 import { DeckCell as DeckCellComponent } from "@workspace/deck/components/DeckCell";
-import { Cell } from "@workspace/deck/types";
+import { BorderRadius, Cell } from "@workspace/deck/types/board";
 
 type DeckPageButtonProps = {
-  width: number;
-  height: number;
   cell?: Cell;
+  borderRadius?: BorderRadius;
+  borderWidth?: number;
   onPointerDown?: (id: string) => void;
   onPointerUp?: (id: string) => void;
 };
 
 export function DeckCell(props: DeckPageButtonProps) {
-  const { width, height, cell, onPointerDown, onPointerUp } = props;
+  const { cell, borderRadius, borderWidth, onPointerDown, onPointerUp } = props;
 
   const handlePointerUp = () => {
-    if (cell?.endActionId) {
-      onPointerUp?.(cell.endActionId);
-    }
+    // if (cell?.endActionId) {
+    //   onPointerUp?.(cell.endActionId);
+    // }
   };
 
   const handlePointerDown = () => {
-    if (cell?.startActionId) {
-      onPointerDown?.(cell.startActionId);
-    }
+    // if (cell?.startActionId) {
+    //   onPointerDown?.(cell.startActionId);
+    // }
   };
 
   return (
     <DeckCellComponent
-      text={cell?.title}
-      icon={cell?.icon}
-      backgroundColor={cell?.color}
-      width={width}
-      height={height}
+      text={cell?.title?.title}
+      icon={cell?.icon?.icon}
+      backgroundColor={cell?.background?.color}
+      borderRadius={borderRadius}
+      borderWidth={borderWidth}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
     />
