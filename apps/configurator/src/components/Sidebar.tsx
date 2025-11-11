@@ -25,7 +25,6 @@ export const Sidebar = memo((props: SidebarProps) => {
   const handleChange = useCallback(
     (form: DeckEditorSettingsFormData) => {
       if (settings) {
-        console.log("streamerbot", settings);
         mutate({ ...settings, ...form });
       }
     },

@@ -1,5 +1,6 @@
-import { DeckGridCell as DeckCellComponent } from "@workspace/deck/components/DeckGridCell";
+import { DeckGridCell } from "@workspace/deck/components/DeckGridCell";
 import { BorderRadius, Cell } from "@workspace/deck/types/board";
+import { cn } from "@workspace/utils/cn";
 import { useLogRenders } from "@workspace/utils/debug";
 
 type DeckPageButtonProps = {
@@ -10,25 +11,33 @@ type DeckPageButtonProps = {
   onPointerUp?: (id: string) => void;
 };
 
-export function DeckCell(props: DeckPageButtonProps) {
-  useLogRenders('DeckCell');
+export function DeckItem(props: DeckPageButtonProps) {
+  useLogRenders("DeckItem");
 
   const { cell, borderRadius, borderWidth, onPointerDown, onPointerUp } = props;
 
   const handlePointerUp = () => {
-    // if (cell?.endActionId) {
-    //   onPointerUp?.(cell.endActionId);
-    // }
+    if (cell?.data?.type == "streamerbot.action") {
+      const id = cell?.data?.releaseAction?.id;
+
+      if (id) {
+        onPointerUp?.(id);
+      }
+    }
   };
 
   const handlePointerDown = () => {
-    // if (cell?.startActionId) {
-    //   onPointerDown?.(cell.startActionId);
-    // }
+    if (cell?.data?.type == "streamerbot.action") {
+      const id = cell?.data?.pressAction?.id;
+
+      if (id) {
+        onPointerDown?.(id);
+      }
+    }
   };
 
   return (
-    <DeckCellComponent
+    <DeckGridCell
       text={cell?.title?.title}
       icon={cell?.icon?.icon}
       backgroundColor={cell?.background?.color}
@@ -36,6 +45,7 @@ export function DeckCell(props: DeckPageButtonProps) {
       borderWidth={borderWidth}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
+      className={cn("active:scale-90")}
     />
   );
 }

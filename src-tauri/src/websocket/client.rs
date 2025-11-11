@@ -19,21 +19,26 @@ use crate::{
     state::{AppState, SBMessage, SocketStatus},
 };
 
-async fn connect_and_rerun(sender: Sender<SBMessage>, abort_rx: Sender<()>) {
+const RECONNECT_DELAY: Duration = Duration::from_secs(5);
+
+async fn connect_loop(sender: Sender<SBMessage>, abort_rx: Sender<()>) {
     loop {
         let abort_rx = abort_rx.subscribe();
 
-        if let Ok(()) = connect(sender.clone(), abort_rx).await {
-            println!("Connection closed");
-            break;
+        match connect_once(sender.clone(), abort_rx).await {
+            Ok(_) => {
+                tracing::info!("Connection closed gracefully");
+                break;
+            }
+            Err(_) => {
+                tracing::warn!("Connection error. Reconnecting in {RECONNECT_DELAY:?}...");
+                sleep(RECONNECT_DELAY).await;
+            }
         }
-
-        println!("Trying to reconnect...");
-        sleep(Duration::from_secs(500)).await;
     }
 }
 
-async fn connect(
+async fn connect_once(
     sender: Sender<SBMessage>,
     mut abort_rx: broadcast::Receiver<()>,
 ) -> Result<(), ()> {
@@ -41,7 +46,7 @@ async fn connect(
 
     match connect_async(&url).await {
         Ok((ws_stream, _)) => {
-            println!("WebSocket handshake has been successfully completed: {url}");
+            tracing::info!("WebSocket handshake has been successfully completed: {url}");
 
             let state = app_handle().state::<Arc<AppState>>();
             state.set_status(SocketStatus::Connected).await;
@@ -54,7 +59,7 @@ async fn connect(
                         Ok(Message::Close(_)) => {
                             let state = app_handle().state::<Arc<AppState>>();
                             state.set_status(SocketStatus::Disconnected).await;
-                            println!("Connection closed");
+                            println!("connect_async Connection closed");
                             break;
                         }
                         Ok(_) => {}
@@ -119,8 +124,10 @@ pub async fn client(state: Arc<AppState>) {
     let (abort_tx, _abort_rx) = broadcast::channel::<()>(1);
     let connect_abort_tx = abort_tx.clone();
 
+    let mut url = get_streamer_bot_url();
+
     tokio::spawn(async move {
-        connect_and_rerun(sb_sender, connect_abort_tx).await;
+        connect_loop(sb_sender, connect_abort_tx).await;
     });
 
     let _ = tokio::spawn(async move {
@@ -128,16 +135,22 @@ pub async fn client(state: Arc<AppState>) {
             let sender = state.sb_sender.clone();
 
             if let SBMessage::SettingsUpdated = message {
-                let state = app_handle().state::<Arc<AppState>>();
-                state.set_status(SocketStatus::Connecting).await;
+                let new_url = get_streamer_bot_url();
 
-                abort_tx.send(()).unwrap();
+                if url != new_url {
+                    url = new_url;
 
-                let connect_abort_tx = abort_tx.clone();
+                    let state = app_handle().state::<Arc<AppState>>();
+                    state.set_status(SocketStatus::Connecting).await;
 
-                tokio::spawn(async move {
-                    connect_and_rerun(sender, connect_abort_tx).await;
-                });
+                    abort_tx.send(()).unwrap();
+
+                    let connect_abort_tx = abort_tx.clone();
+
+                    tokio::spawn(async move {
+                        connect_loop(sender, connect_abort_tx).await;
+                    });
+                }
             }
         }
     })

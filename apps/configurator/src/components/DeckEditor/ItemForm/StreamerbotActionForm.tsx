@@ -1,7 +1,6 @@
 import { StreamerbotConnectionEdit } from "@/components/DeckEditor/ItemForm/StreamerbotConnectionEdit";
 import { useStreamerbotContext } from "@/context/StreamerbotContext";
 import { Cell } from "@workspace/deck/types/board";
-import { StreamerbotAction } from "@workspace/deck/types/streamerbot";
 import { Button } from "@workspace/ui/components/button";
 import { Combobox } from "@workspace/ui/components/Combobox";
 import { FormField } from "@workspace/ui/components/form";
@@ -18,12 +17,11 @@ import { UseFormReturn } from "react-hook-form";
 
 export type StreamerbotActionFormProps = {
   form: UseFormReturn<Cell>;
-  data: StreamerbotAction;
 };
 
 export const StreamerbotActionForm = memo(
   (props: StreamerbotActionFormProps) => {
-    const { data, form } = props;
+    const { form } = props;
 
     const streamerbot = useStreamerbotContext();
 

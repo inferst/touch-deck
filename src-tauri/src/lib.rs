@@ -36,6 +36,8 @@ pub fn app_handle<'a>() -> &'a AppHandle {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[tokio::main]
 pub async fn run() {
+    tracing_subscriber::fmt::init();
+
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_positioner::init())
         .setup(|app| {

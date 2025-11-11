@@ -13,7 +13,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useLogRenders } from "@workspace/utils/debug";
 import { XIcon } from "lucide-react";
 import { memo } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { FieldErrors, useForm, useWatch } from "react-hook-form";
 
 type DeckEditorItemFormProps = {
   cell: Cell;
@@ -47,7 +47,7 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
     onSave(data);
   };
 
-  const handleInvalid = (errors, data) => {
+  const handleInvalid = (errors: FieldErrors) => {
     console.log(errors, form.getValues());
   };
 
@@ -80,7 +80,7 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
                     name="title.title"
                     render={({ field }) => (
                       <Input
-                        className="w-40 mr-2 col-span-3 w-full"
+                        className="mr-2 col-span-3 w-full"
                         {...field}
                       />
                     )}

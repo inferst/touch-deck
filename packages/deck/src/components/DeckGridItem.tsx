@@ -24,6 +24,7 @@ export type DeckGridItemProps = {
   borderWidth?: number;
   borderColor?: string;
   borderRadius?: BorderRadius;
+  className?: string;
   onClick?: (event: React.MouseEvent) => void;
   onPointerDown?: (event: React.PointerEvent) => void;
   onPointerUp?: (event: React.PointerEvent) => void;
@@ -32,7 +33,7 @@ export type DeckGridItemProps = {
 };
 
 export const DeckGridItem = memo((props: DeckGridItemProps) => {
-  useLogRenders('DeckGridItem');
+  useLogRenders("DeckGridItem");
 
   const {
     ref,
@@ -47,6 +48,7 @@ export const DeckGridItem = memo((props: DeckGridItemProps) => {
     borderWidth = 0,
     borderColor = "#222",
     borderRadius = 2,
+    className,
     onClick,
     onPointerDown,
     onPointerUp,
@@ -109,11 +111,10 @@ export const DeckGridItem = memo((props: DeckGridItemProps) => {
         "select-none",
         "cursor-pointer",
         "bg-(--bg-color)",
-        "active:scale-90",
-        "active:z-10",
         "rounded-(--border-radius)",
         "border-(length:--border-width)",
         "border-(--border-color)",
+        className,
       )}
       style={styleProps}
     >

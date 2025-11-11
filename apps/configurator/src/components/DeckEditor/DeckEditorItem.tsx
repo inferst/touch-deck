@@ -33,7 +33,7 @@ export type DeckEditorItemProps = {
 };
 
 export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
-  useLogRenders('DeckEditorItem');
+  useLogRenders("DeckEditorItem");
 
   const { cell, onSave } = props;
 
@@ -94,16 +94,46 @@ export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
     [isDragOver],
   );
 
+  const [isHovered, setIsHovered] = useState(false);
+
+  const isEmpty = useMemo(() => !cell?.data?.type, [cell]);
+
+  const icon = useMemo(
+    () => (isEmpty && isHovered ? "plus" : cell?.icon?.icon),
+    [cell, isHovered, isEmpty],
+  );
+
+  const iconSize = useMemo(
+    () => (isEmpty && isHovered ? 2 : undefined),
+    [isHovered, isEmpty],
+  );
+
+  const backgroundColor = useMemo(
+    () => (isEmpty && isHovered ? "#555555" : cell?.background?.color),
+    [cell, isHovered, isEmpty],
+  );
+
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false);
+  }, []);
+
   return (
     <FullscreenDialog open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <FullscreenDialogTrigger asChild>
         <DeckGridCell
           ref={ref}
           text={cell?.title?.title}
-          icon={cell?.icon?.icon}
-          backgroundColor={cell?.background?.color}
+          icon={icon}
+          iconSize={iconSize}
+          backgroundColor={backgroundColor}
           borderColor={borderColor}
           borderRadius={settings.style.borderRadius}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         />
       </FullscreenDialogTrigger>
       <FullscreenDialogContent>

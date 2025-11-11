@@ -7,7 +7,7 @@ import { ButtonGroup } from "@workspace/ui/components/button-group";
 import { ChevronDown, ChevronUp, FullscreenIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import useWebSocket from "react-use-websocket";
-import { DeckCell } from "./DeckCell";
+import { DeckItem } from "./DeckItem";
 import { useLogRenders } from "@workspace/utils/debug";
 
 type Message = {
@@ -21,7 +21,7 @@ type GetDataPayload = {
 };
 
 function Deck() {
-  useLogRenders('Deck');
+  useLogRenders("Deck");
 
   const [pageNumber, setPageNumber] = useState(0);
 
@@ -30,8 +30,8 @@ function Deck() {
   const { lastJsonMessage, sendJsonMessage } = useWebSocket(
     `ws://${location.hostname}:3001/ws`,
     {
-      reconnectInterval: 10,
-      reconnectAttempts: 10,
+      reconnectInterval: 3000,
+      shouldReconnect: () => true,
     },
   );
 
@@ -54,6 +54,7 @@ function Deck() {
         case "getData": {
           const payload = message.payload as GetDataPayload;
           console.log(payload);
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setData(payload);
         }
       }
@@ -129,7 +130,7 @@ function Deck() {
               const cell = getCell(pageBoard, row, col);
               return (
                 cell && (
-                  <DeckCell
+                  <DeckItem
                     cell={cell}
                     borderRadius={data.settings.style.borderRadius}
                     onPointerDown={handleAction}
@@ -145,31 +146,31 @@ function Deck() {
         <div className="flex relative justify-center items-center px-6 border-l-2 border-border bg-muted">
           {hasFullscreenButton && (
             <Button
-              className="absolute top-4"
+              className="absolute top-4 size-10 rounded-xl"
               variant={"secondary"}
               size={"icon"}
               onPointerDown={handleFullscreen}
             >
-              <FullscreenIcon />
+              <FullscreenIcon className="size-6" />
             </Button>
           )}
           <ButtonGroup orientation="vertical">
             <Button
               onPointerDown={handleNextPageClick}
               variant={"secondary"}
-              className="size-12 rounded-2xl"
+              className="size-10 rounded-2xl"
             >
-              <ChevronUp className="size-10" />
+              <ChevronUp className="size-6" />
             </Button>
-            <Button variant={"outline"} className="size-12 text-2xl">
+            <Button variant={"outline"} className="size-10 text-2xl border-none">
               {pageNumber + 1}
             </Button>
             <Button
               onPointerDown={handlePrevPageClick}
               variant={"secondary"}
-              className="size-12 rounded-2xl"
+              className="size-10 rounded-2xl"
             >
-              <ChevronDown className="size-10" />
+              <ChevronDown className="size-6" />
             </Button>
           </ButtonGroup>
         </div>
