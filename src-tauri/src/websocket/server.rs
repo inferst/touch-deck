@@ -12,7 +12,7 @@ use std::sync::Arc;
 use tokio::sync::{Mutex, broadcast::Sender};
 
 use crate::{
-    settings::{get_layout, get_pages},
+    settings::{get_deck, get_settings},
     state::{AppState, SBMessage, ServerMessage},
 };
 
@@ -62,7 +62,12 @@ pub async fn handle_socket(socket: axum::extract::ws::WebSocket, state: State<Ar
 
 async fn do_action(sb_sender: Sender<SBMessage>, message: MessageData) {
     if let Some(id) = message.payload {
-        let _ = sb_sender.send(SBMessage::DoAction(id)).unwrap();
+        match sb_sender.send(SBMessage::DoAction(id)) {
+            Ok(_) => {}
+            Err(error) => {
+                tracing::error!("{}", error.to_string());
+            }
+        }
     }
 }
 
@@ -70,16 +75,18 @@ async fn get_data(socket: Arc<Mutex<SplitSink<WebSocket, Message>>>) {
     let response = json!({
         "name": "getData",
         "payload": {
-            "pages": get_pages(),
-            "layout": get_layout(),
+            "deck": get_deck(),
+            "settings": get_settings(),
         }
     });
 
-    let json_response = serde_json::to_string(&response).unwrap();
-
-    let mut socket = socket.lock().await;
-    socket
-        .send(Message::Text(json_response.into()))
-        .await
-        .unwrap();
+    match serde_json::to_string(&response) {
+        Ok(json) => {
+            let mut socket = socket.lock().await;
+            socket.send(Message::Text(json.into())).await.unwrap();
+        }
+        Err(error) => {
+            tracing::error!("{}", error);
+        }
+    }
 }

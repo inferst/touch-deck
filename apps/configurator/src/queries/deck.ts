@@ -1,22 +1,34 @@
 import { store } from "@/store";
-import { Deck, DeckPage } from "@/types/deck";
 import { useQuery } from "@tanstack/react-query";
+import { Deck, DeckSchema } from "@workspace/deck/types/board";
+import z from "zod";
 
-async function getDeck(): Promise<Deck> {
-  const pages: DeckPage[] = (await store.get("pages")) ?? [
+export const DeckDefaultSchema = z.object({
+  pages: DeckSchema.shape.pages.catch([
     {
       id: crypto.randomUUID(),
-      buttons: {},
+      board: {},
     },
-  ];
+  ]),
+});
 
-  return { pages };
+async function getDeck(): Promise<Deck> {
+  const deck = (await store.get("deck")) ?? {};
+
+  try {
+    const parsed = DeckDefaultSchema.parse(deck);
+    return parsed;
+  } catch (error) {
+    console.error("Missing default fields", error);
+    throw error;
+  }
 }
 
 export function useDeckQuery() {
   const query = useQuery({
     queryKey: ["deck"],
     queryFn: () => getDeck(),
+    throwOnError: true,
   });
 
   return query;

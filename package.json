@@ -10,8 +10,8 @@
     "tauri": "tauri"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.9.1",
-    "turbo": "^2.5.8"
+    "@tauri-apps/cli": "^2.9.2",
+    "turbo": "^2.6.0"
   },
   "packageManager": "pnpm@10.6.2"
 }

@@ -1,12 +1,10 @@
 import { api } from "@/api";
 import { store } from "@/store";
-import { Settings } from "@/types/settings";
+import { DeckSettings } from "@workspace/deck/types/board";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-async function saveSettings(settings: Settings) {
-  await store.set("streamerbot", settings.streamerbot);
-  await store.set("layout", settings.layout);
-  await store.set("tray", settings.tray);
+async function saveSettings(settings: DeckSettings) {
+  await store.set("settings", settings);
   await store.save();
 
   api.emitSettingsUpdate();

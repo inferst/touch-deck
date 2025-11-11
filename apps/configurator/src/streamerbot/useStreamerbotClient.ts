@@ -24,16 +24,16 @@ export function useStreamerbotClient(): Streamerbot {
     const options: Partial<StreamerbotClientOptions> = {};
 
     if (data) {
-      if (data.streamerbot.host) {
-        options.host = data.streamerbot.host;
+      if (data.connection.streamerbot.host) {
+        options.host = data.connection.streamerbot.host;
       }
 
-      if (data.streamerbot.port) {
-        options.port = data.streamerbot.port;
+      if (data.connection.streamerbot.port) {
+        options.port = data.connection.streamerbot.port;
       }
 
-      if (data.streamerbot.endpoint) {
-        options.endpoint = data.streamerbot.endpoint;
+      if (data.connection.streamerbot.endpoint) {
+        options.endpoint = data.connection.streamerbot.endpoint;
       }
     }
 

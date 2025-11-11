@@ -1,8 +1,11 @@
 import { api } from "@/api";
+import { useLogRenders } from "@workspace/utils/debug";
 import QRCode from "qrcode";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
-export function QRCodeCanvas() {
+export const QRCodeCanvas = memo(() => {
+  useLogRenders('QRCodeCanvas');
+
   const ref = useRef<HTMLCanvasElement>(null);
 
   const [url, setUrl] = useState("");
@@ -23,7 +26,6 @@ export function QRCodeCanvas() {
         },
         function (error) {
           if (error) console.error(error);
-          console.log("success!");
         },
       );
     }
@@ -40,4 +42,4 @@ export function QRCodeCanvas() {
       </div>
     </div>
   );
-}
+});
