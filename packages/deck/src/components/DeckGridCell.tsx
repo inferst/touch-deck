@@ -1,11 +1,14 @@
-import { useDeckGrid } from "@workspace/deck/components/DeckContext";
-import { DeckItem, DeckItemProps } from "@workspace/deck/components/DeckItem";
+import { useDeckGridContext } from "@workspace/deck/components/DeckGridContext";
+import { DeckGridItem, DeckGridItemProps } from "@workspace/deck/components/DeckGridItem";
+import { useLogRenders } from "@workspace/utils/debug";
 import { memo, useCallback, useState } from "react";
 
-export type DeckCellProps = {} & DeckItemProps;
+export type DeckGridCellProps = {} & DeckGridItemProps;
 
-export const DeckCell = memo((props: DeckCellProps) => {
-  const deck = useDeckGrid();
+export const DeckGridCell = memo((props: DeckGridCellProps) => {
+  useLogRenders('DeckGridCell');
+
+  const deck = useDeckGridContext();
   const [isHover, setIsHover] = useState(false);
 
   const handleMouseEnter = useCallback(() => {
@@ -17,7 +20,7 @@ export const DeckCell = memo((props: DeckCellProps) => {
   }, []);
 
   return (
-    <DeckItem
+    <DeckGridItem
       {...props}
       icon={isHover && !props.icon ? "plus" : props.icon}
       iconSize={isHover && !props.icon ? 2 : props.iconSize}

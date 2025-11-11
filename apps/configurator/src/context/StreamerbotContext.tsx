@@ -25,8 +25,6 @@ export const StreamerbotProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const data = useStreamerbot();
 
-  console.log("streamerbot", data);
-
   return (
     <StreamerbotContext.Provider value={data}>
       {children}

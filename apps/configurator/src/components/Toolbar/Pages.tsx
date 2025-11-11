@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import { cn } from "@workspace/ui/lib/utils";
+import { useLogRenders } from "@workspace/utils/debug";
 import { EllipsisIcon, PlusIcon } from "lucide-react";
 import { memo } from "react";
 
@@ -21,6 +22,8 @@ type PagesProps = {
 };
 
 export const Pages = memo((props: PagesProps) => {
+  useLogRenders('Pages');
+
   const deckQuery = useDeckQuery();
   const deckMutation = useDeckMutation();
 

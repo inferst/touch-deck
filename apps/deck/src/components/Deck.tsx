@@ -1,12 +1,14 @@
 import { generateBoard, getCell } from "@workspace/deck/board";
 import { DeckGrid } from "@workspace/deck/components/DeckGrid";
-import { DeckSettings, DeckSettingsSchema, Deck as DeckType } from "@workspace/deck/types/board";
+import { DeckSettingsDefaultSchema } from "@workspace/deck/schema/settings";
+import { DeckSettings, Deck as DeckType } from "@workspace/deck/types/board";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonGroup } from "@workspace/ui/components/button-group";
 import { ChevronDown, ChevronUp, FullscreenIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import { DeckCell } from "./DeckCell";
+import { useLogRenders } from "@workspace/utils/debug";
 
 type Message = {
   name: string;
@@ -19,6 +21,8 @@ type GetDataPayload = {
 };
 
 function Deck() {
+  useLogRenders('Deck');
+
   const [pageNumber, setPageNumber] = useState(0);
 
   const ref = useRef<HTMLDivElement | null>(null);
@@ -33,7 +37,7 @@ function Deck() {
 
   const [data, setData] = useState<GetDataPayload>({
     deck: { pages: [] },
-    settings: DeckSettingsSchema.parse({}),
+    settings: DeckSettingsDefaultSchema.parse({}),
   });
 
   useEffect(() => {

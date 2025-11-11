@@ -1,5 +1,6 @@
-import { DeckCell as DeckCellComponent } from "@workspace/deck/components/DeckCell";
+import { DeckGridCell as DeckCellComponent } from "@workspace/deck/components/DeckGridCell";
 import { BorderRadius, Cell } from "@workspace/deck/types/board";
+import { useLogRenders } from "@workspace/utils/debug";
 
 type DeckPageButtonProps = {
   cell?: Cell;
@@ -10,6 +11,8 @@ type DeckPageButtonProps = {
 };
 
 export function DeckCell(props: DeckPageButtonProps) {
+  useLogRenders('DeckCell');
+
   const { cell, borderRadius, borderWidth, onPointerDown, onPointerUp } = props;
 
   const handlePointerUp = () => {

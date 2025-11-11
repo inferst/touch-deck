@@ -10,11 +10,14 @@ import { Button } from "@workspace/ui/components/button";
 import { FormField } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
+import { useLogRenders } from "@workspace/utils/debug";
 import { Edit, RefreshCw } from "lucide-react";
 import { memo, useState } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
 
 export const StreamerbotConnectionEdit = memo(() => {
+  useLogRenders('StreamerbotConnectionEdit');
+
   const settings = useSettingsContext();
   const { mutate } = useSettingsMutation();
   const connection = settings.connection.streamerbot;
@@ -63,8 +66,6 @@ export const StreamerbotConnectionEdit = memo(() => {
   const handleCancel = () => {
     setIsEdit(false);
   };
-
-  console.log('StreamerbotConnectionEdit render');
 
   return (
     <>

@@ -1,6 +1,7 @@
 import { Pages } from "@/components/Toolbar/Pages";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
+import { useLogRenders } from "@workspace/utils/debug";
 import { SettingsIcon } from "lucide-react";
 import { memo } from "react";
 
@@ -11,6 +12,8 @@ export type ToolbarProps = {
 };
 
 export const Toolbar = memo((props: ToolbarProps) => {
+  useLogRenders('Toolbar');
+
   const { selectedPageNumber, onPageChange, onSidebarToggle } = props;
 
   return (

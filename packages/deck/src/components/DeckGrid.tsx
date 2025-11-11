@@ -1,7 +1,8 @@
-import { DeckGridContext } from "@workspace/deck/components/DeckContext";
+import { DeckGridContext } from "@workspace/deck/components/DeckGridContext";
 import { Spacing } from "@workspace/deck/types/board";
-import { useThrottle } from "@workspace/deck/utils/throttle";
 import { cn } from "@workspace/ui/lib/utils";
+import { useThrottle } from "@workspace/utils/throttle";
+import { useLogRenders } from "@workspace/utils/debug";
 import {
   memo,
   ReactNode,
@@ -21,6 +22,8 @@ type DeckGridProps = {
 };
 
 export const DeckGrid = memo((props: DeckGridProps) => {
+  useLogRenders('DeckGrid');
+
   const { children, rows, columns, spacing = 0, className } = props;
 
   const [screenRatio, setScreenRatio] = useState(1);
@@ -50,7 +53,6 @@ export const DeckGrid = memo((props: DeckGridProps) => {
     const containerWidth = entry.contentRect.width;
     const containerHeight = entry.contentRect.height;
     setScreenRatio(containerWidth / containerHeight);
-    console.log("screenRatio", containerWidth, containerHeight);
   }, []);
 
   useLayoutEffect(() => {
@@ -91,8 +93,6 @@ export const DeckGrid = memo((props: DeckGridProps) => {
     () => ({ borderWidth: cellBorderWidth }),
     [cellBorderWidth],
   );
-
-  console.log("DeckGrid render");
 
   return (
     <DeckGridContext.Provider value={contextValue}>

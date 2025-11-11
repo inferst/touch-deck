@@ -13,6 +13,7 @@ import {
 } from "@workspace/deck/board";
 import { DeckGrid } from "@workspace/deck/components/DeckGrid";
 import { Board, Cell } from "@workspace/deck/types/board";
+import { useLogRenders } from "@workspace/utils/debug";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 function getInstanceId() {
@@ -24,6 +25,8 @@ type DeckProps = {
 };
 
 export const DeckEditor = memo((props: DeckProps) => {
+  useLogRenders('DeckEditor');
+
   const { page } = props;
 
   const settings = useSettingsContext();
@@ -126,8 +129,6 @@ export const DeckEditor = memo((props: DeckProps) => {
   if (!pageId) {
     return "Page not found";
   }
-
-  console.log("DeckEditor render");
 
   return (
     <InstanceIdContext.Provider value={instanceId}>

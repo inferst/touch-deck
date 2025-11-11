@@ -6,7 +6,7 @@ import {
   draggable,
   dropTargetForElements,
 } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { DeckCell } from "@workspace/deck/components/DeckCell";
+import { DeckGridCell } from "@workspace/deck/components/DeckGridCell";
 import { Cell } from "@workspace/deck/types/board";
 import {
   FullscreenDialog,
@@ -16,7 +16,16 @@ import {
   FullscreenDialogTitle,
   FullscreenDialogTrigger,
 } from "@workspace/ui/components/fullscreen-dialog";
-import { memo, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useLogRenders } from "@workspace/utils/debug";
+import {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 export type DeckEditorItemProps = {
   cell: Cell;
@@ -24,6 +33,8 @@ export type DeckEditorItemProps = {
 };
 
 export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
+  useLogRenders('DeckEditorItem');
+
   const { cell, onSave } = props;
 
   const settings = useSettingsContext();
@@ -33,14 +44,21 @@ export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
 
   const ref = useRef<HTMLDivElement | null>(null);
 
-  const handleSave = (data: Cell) => {
-    onSave({
-      ...cell,
-      ...data,
-    });
+  const handleSave = useCallback(
+    (data: Cell) => {
+      onSave({
+        ...cell,
+        ...data,
+      });
 
+      setIsOpen(false);
+    },
+    [onSave, cell],
+  );
+
+  const handleCancel = useCallback(() => {
     setIsOpen(false);
-  };
+  }, []);
 
   const instanceId = useContext(InstanceIdContext);
 
@@ -76,12 +94,10 @@ export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
     [isDragOver],
   );
 
-  console.log("DeckEditorItemForm render");
-
   return (
     <FullscreenDialog open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <FullscreenDialogTrigger asChild>
-        <DeckCell
+        <DeckGridCell
           ref={ref}
           text={cell?.title?.title}
           icon={cell?.icon?.icon}
@@ -99,7 +115,7 @@ export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
           <DeckEditorItemType
             cell={cell}
             onSave={handleSave}
-            onCancel={() => {}}
+            onCancel={handleCancel}
           />
         </div>
       </FullscreenDialogContent>

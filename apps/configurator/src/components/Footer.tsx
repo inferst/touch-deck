@@ -10,8 +10,11 @@ import {
 import { memo } from "react";
 import { QRCodeCanvas } from "./QRCode/QRCode";
 import { cn } from "@workspace/ui/lib/utils";
+import { useLogRenders } from "@workspace/utils/debug";
 
 export const Footer = memo(() => {
+  useLogRenders('Footer');
+
   return (
     <div
       className={cn(

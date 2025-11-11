@@ -3,9 +3,12 @@ import { Footer } from "@/components/Footer";
 import { Sidebar } from "@/components/Sidebar";
 import { Toolbar } from "@/components/Toolbar/Toolbar";
 import { cn } from "@workspace/ui/lib/utils";
+import { useLogRenders } from "@workspace/utils/debug";
 import { memo, useCallback, useState } from "react";
 
 export const Editor = memo(() => {
+  useLogRenders('Editor');
+
   const [page, setPage] = useState(0);
 
   const [isSidebarOpened, setIsSidebarOpened] = useState(false);
@@ -13,8 +16,6 @@ export const Editor = memo(() => {
   const handleSidebarToggle = useCallback(() => {
     setIsSidebarOpened((value) => !value);
   }, []);
-
-  console.log("Editor render");
 
   return (
     <div className={cn("w-full", "h-svh", "overflow-hidden", "flex")}>

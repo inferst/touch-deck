@@ -17,6 +17,7 @@ import {
 } from "@workspace/ui/components/select";
 import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
+import { useLogRenders } from "@workspace/utils/debug";
 import { ImportIcon, XIcon } from "lucide-react";
 import { memo, useCallback, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -41,6 +42,8 @@ export type DeckEditorSettingsProps = {
 };
 
 export const DeckEditorSettings = memo((props: DeckEditorSettingsProps) => {
+  useLogRenders('DeckEditorSettings');
+
   const { data, onChange } = props;
 
   const deck = useDeckContext();

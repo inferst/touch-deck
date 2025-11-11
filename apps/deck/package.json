@@ -13,6 +13,7 @@
     "@streamerbot/client": "^1.12.2",
     "@workspace/deck": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "@workspace/utils": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.552.0",

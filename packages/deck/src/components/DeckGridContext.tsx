@@ -8,7 +8,7 @@ export const DeckGridContext = createContext<DeckGridContextValue | undefined>(
   undefined,
 );
 
-export const useDeckGrid = () => {
+export const useDeckGridContext = () => {
   const context = useContext(DeckGridContext);
 
   if (!context) {

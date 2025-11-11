@@ -2,7 +2,7 @@ import { IconPicker } from "@/components/DeckEditor/ItemForm/IconPicker";
 import { ItemForm } from "@/components/DeckEditor/ItemForm/ItemForm";
 import { useSettingsContext } from "@/context/SettingsContext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DeckItem } from "@workspace/deck/components/DeckItem";
+import { DeckGridItem } from "@workspace/deck/components/DeckGridItem";
 import { Cell, CellSchema } from "@workspace/deck/types/board";
 import { Button } from "@workspace/ui/components/button";
 import { Form, FormField } from "@workspace/ui/components/form";
@@ -10,6 +10,7 @@ import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { cn } from "@workspace/ui/lib/utils";
+import { useLogRenders } from "@workspace/utils/debug";
 import { XIcon } from "lucide-react";
 import { memo } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -21,7 +22,9 @@ type DeckEditorItemFormProps = {
 };
 
 export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
-  const { cell: cell, onSave } = props;
+  useLogRenders('DeckEditorItemForm');
+
+  const { cell: cell, onSave, onCancel } = props;
 
   const settings = useSettingsContext();
 
@@ -46,14 +49,18 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
 
   const handleInvalid = (errors, data) => {
     console.log(errors, form.getValues());
-  }
+  };
+
+  const handleCancel = () => {
+    onCancel();
+  };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit, handleInvalid)}>
         <div className="flex gap-2">
           <div className={cn("flex w-[100px] h-[100px]", "shrink-0")}>
-            <DeckItem
+            <DeckGridItem
               text={title?.title}
               backgroundColor={background?.color}
               icon={icon?.icon}
@@ -62,7 +69,7 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
             />
           </div>
           <div className="">
-            <ScrollArea className="h-[300px]">
+            <ScrollArea className="h-[400px] pr-4">
               <div className="grid gap-2">
                 <div className="grid grid-cols-4 gap-2 items-center">
                   <Label htmlFor="title" className="block text-right">
@@ -129,9 +136,18 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
               </div>
             </ScrollArea>
             <div className="grid grid-cols-4 gap-2 mt-4">
-              <Button type="submit" className="col-start-2">
-                Save
-              </Button>
+              <div className="flex col-start-2">
+                <Button type="submit" className="mr-2">
+                  Save
+                </Button>
+                <Button
+                  variant={"secondary"}
+                  type="button"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
           </div>
         </div>

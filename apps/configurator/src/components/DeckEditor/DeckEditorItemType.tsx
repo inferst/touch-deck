@@ -1,6 +1,7 @@
 import { DeckEditorItemForm } from "@/components/DeckEditor/DeckEditorItemForm";
 import { Cell, CellData } from "@workspace/deck/types/board";
 import { Button } from "@workspace/ui/components/button";
+import { useLogRenders } from "@workspace/utils/debug";
 import { memo, useCallback, useMemo, useState } from "react";
 
 type DeckEditorItemTypeProps = {
@@ -10,7 +11,9 @@ type DeckEditorItemTypeProps = {
 };
 
 export const DeckEditorItemType = memo((props: DeckEditorItemTypeProps) => {
-  const { cell, onSave } = props;
+  useLogRenders('DeckEditorItemType');
+
+  const { cell, onSave, onCancel } = props;
   const [selectedType, setSelectedType] = useState<CellData["type"]>();
 
   const handleSelectType = (type: CellData["type"]) => {
@@ -23,6 +26,10 @@ export const DeckEditorItemType = memo((props: DeckEditorItemTypeProps) => {
     },
     [onSave],
   );
+
+  const handleCancel = useCallback(() => {
+    onCancel();
+  }, [onCancel]);
 
   const item: Cell = useMemo(() => {
     const selected = selectedType ? { type: selectedType } : undefined;
@@ -52,7 +59,7 @@ export const DeckEditorItemType = memo((props: DeckEditorItemTypeProps) => {
             <DeckEditorItemForm
               cell={item}
               onSave={handleSave}
-              onCancel={() => {}}
+              onCancel={handleCancel}
             />
           </div>
         </div>

@@ -4,13 +4,14 @@ import {
   IconSize,
   TextAlign,
 } from "@workspace/deck/types/board";
-import { mergeRefs } from "@workspace/deck/utils/mergeRefs";
 import { Icon } from "@workspace/ui/components/icon";
 import { cn } from "@workspace/ui/lib/utils";
+import { useLogRenders } from "@workspace/utils/debug";
+import { mergeRefs } from "@workspace/utils/mergeRefs";
 import { IconName } from "lucide-react/dynamic";
-import { memo, RefObject, useRef, useState } from "react";
+import { memo, RefObject, useRef } from "react";
 
-export type DeckItemProps = {
+export type DeckGridItemProps = {
   ref?: RefObject<HTMLDivElement | null>;
   icon?: string;
   text?: string;
@@ -30,7 +31,9 @@ export type DeckItemProps = {
   onMouseLeave?: (event: React.MouseEvent) => void;
 };
 
-export const DeckItem = memo((props: DeckItemProps) => {
+export const DeckGridItem = memo((props: DeckGridItemProps) => {
+  useLogRenders('DeckGridItem');
+
   const {
     ref,
     icon,
@@ -53,20 +56,7 @@ export const DeckItem = memo((props: DeckItemProps) => {
 
   const innerRef = useRef<HTMLDivElement | null>(null);
 
-  const [activeScale, setActiveScale] = useState(100);
-
-  const calculateActiveScale = () => {
-    const element = innerRef?.current;
-
-    if (element) {
-      const rect = element.getBoundingClientRect();
-      setActiveScale(100 - (10 / rect.width) * 100);
-    }
-  };
-
   const handlePointerDown = (event: React.PointerEvent) => {
-    calculateActiveScale();
-
     if (onPointerDown) {
       event.preventDefault();
       onPointerDown(event);
@@ -91,7 +81,6 @@ export const DeckItem = memo((props: DeckItemProps) => {
   const styleProps = {
     "--text-color": textColor,
     "--bg-color": backgroundColor,
-    "--scale": `${activeScale}%`,
     "--icon-size": `${iconSize * 10}cqw`,
     "--font-size": `${10 + (textSize * textSize) / 2}cqw`,
     "--border-radius": `${borderRadius * 5}%`,
@@ -120,7 +109,7 @@ export const DeckItem = memo((props: DeckItemProps) => {
         "select-none",
         "cursor-pointer",
         "bg-(--bg-color)",
-        "active:scale-(--scale)",
+        "active:scale-90",
         "active:z-10",
         "rounded-(--border-radius)",
         "border-(length:--border-width)",

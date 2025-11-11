@@ -36,8 +36,6 @@ export const StreamerbotSwitchForm = memo(
       );
     }, [streamerbot.data.actions]);
 
-    console.log(form.formState);
-
     return (
       <>
         <StreamerbotConnectionEdit />

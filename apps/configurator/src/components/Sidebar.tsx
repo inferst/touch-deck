@@ -5,6 +5,7 @@ import {
 import { useSettingsContext } from "@/context/SettingsContext";
 import { useSettingsMutation } from "@/mutations/settings";
 import { cn } from "@workspace/ui/lib/utils";
+import { useLogRenders } from "@workspace/utils/debug";
 import { memo, useCallback, useMemo } from "react";
 
 export type SidebarProps = {
@@ -12,6 +13,8 @@ export type SidebarProps = {
 };
 
 export const Sidebar = memo((props: SidebarProps) => {
+  useLogRenders('Sidebar');
+
   const { isOpened } = props;
 
   const settings = useSettingsContext();
@@ -28,8 +31,6 @@ export const Sidebar = memo((props: SidebarProps) => {
     },
     [mutate, settings],
   );
-
-  console.log("Sidebar render");
 
   return (
     <div
