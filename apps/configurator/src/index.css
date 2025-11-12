@@ -9,6 +9,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@custom-variant h-sm (@media (height >= 40rem));
+@custom-variant h-md (@media (height >= 48rem));
+@custom-variant h-lg (@media (height >= 64rem));
+
 body {
   overflow: hidden;
 }

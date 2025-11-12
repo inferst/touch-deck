@@ -25,7 +25,7 @@ type DeckProps = {
 };
 
 export const DeckEditor = memo((props: DeckProps) => {
-  useLogRenders('DeckEditor');
+  useLogRenders("DeckEditor");
 
   const { page } = props;
 
@@ -126,6 +126,15 @@ export const DeckEditor = memo((props: DeckProps) => {
     [pageId, board, handleSave],
   );
 
+  const maxWidth = useMemo(
+    () => settings.layout.columns * 160,
+    [settings.layout.columns],
+  );
+  const maxHeight = useMemo(
+    () => settings.layout.rows * 160,
+    [settings.layout.rows],
+  );
+
   if (!pageId) {
     return "Page not found";
   }
@@ -137,6 +146,8 @@ export const DeckEditor = memo((props: DeckProps) => {
         rows={settings.layout.rows}
         columns={settings.layout.columns}
         spacing={settings.style.spacing}
+        maxWidth={maxWidth}
+        maxHeight={maxHeight}
         className="w-full h-full flex justify-center items-center"
       >
         {(row, col) => {

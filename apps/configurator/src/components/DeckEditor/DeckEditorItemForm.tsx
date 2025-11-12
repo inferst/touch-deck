@@ -69,7 +69,7 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
             />
           </div>
           <div className="">
-            <ScrollArea className="h-[400px] pr-4">
+            <ScrollArea className="h-[340px] h-sm:h-[380px] h-md:h-[440px] h-md:h-[480px] pr-4">
               <div className="grid gap-2">
                 <div className="grid grid-cols-4 gap-2 items-center">
                   <Label htmlFor="title" className="block text-right">
