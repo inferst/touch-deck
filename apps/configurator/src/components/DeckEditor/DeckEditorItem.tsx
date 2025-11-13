@@ -1,4 +1,4 @@
-import { DeckEditorItemType } from "@/components/DeckEditor/DeckEditorItemType";
+import { DeckEditorItemDialogContent } from "@/components/DeckEditor/DeckEditorItemDialogContent";
 import { InstanceIdContext } from "@/components/Instance";
 import { useSettingsContext } from "@/context/SettingsContext";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
@@ -11,9 +11,6 @@ import { Cell } from "@workspace/deck/types/board";
 import {
   FullscreenDialog,
   FullscreenDialogContent,
-  FullscreenDialogDescription,
-  FullscreenDialogHeader,
-  FullscreenDialogTitle,
   FullscreenDialogTrigger,
 } from "@workspace/ui/components/fullscreen-dialog";
 import { useLogRenders } from "@workspace/utils/debug";
@@ -137,17 +134,11 @@ export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
         />
       </FullscreenDialogTrigger>
       <FullscreenDialogContent>
-        <FullscreenDialogHeader className="h-[26px]">
-          <FullscreenDialogTitle>Button Settings</FullscreenDialogTitle>
-          <FullscreenDialogDescription></FullscreenDialogDescription>
-        </FullscreenDialogHeader>
-        <div className="h-[calc(100%-26px)]">
-          <DeckEditorItemType
-            cell={cell}
-            onSave={handleSave}
-            onCancel={handleCancel}
-          />
-        </div>
+        <DeckEditorItemDialogContent
+          cell={cell}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
       </FullscreenDialogContent>
     </FullscreenDialog>
   );

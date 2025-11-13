@@ -18,13 +18,23 @@ type DeckGridProps = {
   rows: number;
   columns: number;
   spacing?: Spacing;
+  maxWidth?: number;
+  maxHeight?: number;
   className?: string;
 };
 
 export const DeckGrid = memo((props: DeckGridProps) => {
-  useLogRenders('DeckGrid');
+  useLogRenders("DeckGrid");
 
-  const { children, rows, columns, spacing = 0, className } = props;
+  const {
+    children,
+    rows,
+    columns,
+    maxWidth,
+    maxHeight,
+    spacing = 0,
+    className,
+  } = props;
 
   const [screenRatio, setScreenRatio] = useState(1);
   const [cellBorderWidth, setCellBorderWidth] = useState(0);
@@ -104,12 +114,17 @@ export const DeckGrid = memo((props: DeckGridProps) => {
             "flex-col",
             "aspect-(--aspect-ratio)",
             screenRatio < columns / rows ? "w-full" : "h-full",
+            screenRatio < columns / rows
+              ? "max-w-(--max-width)"
+              : "max-h-(--max-height)",
           )}
           style={
             {
               "--aspect-ratio": `${columns} / ${rows}`,
               "--width": `${100 / columns}%`,
               "--height": `${100 / rows}%`,
+              "--max-width": `${maxWidth}px`,
+              "--max-height": `${maxHeight}px`,
               "--spacing": `${cellSpacing}px`,
             } as React.CSSProperties
           }
