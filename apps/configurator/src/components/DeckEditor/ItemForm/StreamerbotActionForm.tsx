@@ -2,7 +2,7 @@ import { StreamerbotConnectionEdit } from "@/components/DeckEditor/ItemForm/Stre
 import { useStreamerbotContext } from "@/context/StreamerbotContext";
 import { Cell } from "@workspace/deck/types/board";
 import { Button } from "@workspace/ui/components/button";
-import { Combobox } from "@workspace/ui/components/Combobox";
+import { Combobox } from "@workspace/ui/components/combobox";
 import { FormField } from "@workspace/ui/components/form";
 import { Label } from "@workspace/ui/components/label";
 import {

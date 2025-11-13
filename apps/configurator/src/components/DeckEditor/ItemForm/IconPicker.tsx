@@ -1,6 +1,6 @@
-import { ComboboxProps } from "@workspace/ui/components/Combobox";
+import { ComboboxProps } from "@workspace/ui/components/combobox";
 import { Icon, icons } from "@workspace/ui/components/icon";
-import { VirtualizedCombobox } from "@workspace/ui/components/VirtualizedCombobox";
+import { VirtualizedCombobox } from "@workspace/ui/components/virtualized-combobox";
 
 const iconItems = icons.map((icon) => ({
   value: icon,

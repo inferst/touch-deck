@@ -81,7 +81,7 @@ export const DeckEditorItemDialogContent = memo(
       <div className="flex justify-center items-center h-full">
         <div className="w-[500px]">
           <DeckEditorItemForm
-            cell={cell}
+            cell={item}
             onSave={handleSave}
             onCancel={handleCancel}
           />
