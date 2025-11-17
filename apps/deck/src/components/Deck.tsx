@@ -35,6 +35,11 @@ function Deck() {
     },
   );
 
+  const actionManagerSocket = useWebSocket(`ws://${location.hostname}:8080`, {
+    reconnectInterval: 3000,
+    shouldReconnect: () => true,
+  });
+
   const [data, setData] = useState<GetDataPayload>({
     deck: { pages: [] },
     settings: DeckSettingsDefaultSchema.parse({}),
@@ -64,7 +69,7 @@ function Deck() {
   }, [lastJsonMessage]);
 
   const handleAction = async (id: string) => {
-    sendJsonMessage({
+    actionManagerSocket.sendJsonMessage({
       name: "doAction",
       payload: id,
     });
@@ -162,7 +167,10 @@ function Deck() {
             >
               <ChevronUp className="size-6" />
             </Button>
-            <Button variant={"outline"} className="size-10 text-2xl border-none">
+            <Button
+              variant={"outline"}
+              className="size-10 text-2xl border-none"
+            >
               {pageNumber + 1}
             </Button>
             <Button

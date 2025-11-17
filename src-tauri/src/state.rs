@@ -1,5 +1,8 @@
+use std::sync::{Arc};
+
 use serde::{Deserialize, Serialize};
 use tauri::Emitter;
+use tauri_plugin_shell::process::CommandChild;
 use tokio::sync::{Mutex, broadcast};
 
 use crate::app_handle;
@@ -36,6 +39,7 @@ pub struct AppState {
     pub server_sender: broadcast::Sender<ServerMessage>,
     // Streamer.bot
     pub sb_sender: broadcast::Sender<SBMessage>,
+    pub action_manager: Arc<std::sync::Mutex<Option<CommandChild>>>,
 }
 
 impl AppState {
@@ -51,6 +55,7 @@ impl AppState {
             data,
             server_sender: socket_tx,
             sb_sender: sb_tx.clone(),
+            action_manager: Arc::new(std::sync::Mutex::new(None)),
         }
     }
 

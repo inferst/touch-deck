@@ -6,7 +6,7 @@ use tauri::{
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent, TrayIconId},
 };
 
-use crate::settings::get_tray_value;
+use crate::{close_app, settings::get_tray_value};
 
 pub static TRAY_ID: OnceLock<TrayIconId> = OnceLock::new();
 
@@ -37,6 +37,7 @@ pub fn build_tray(app: &mut App) -> Result<(), Box<dyn Error>> {
         .on_menu_event(|app, event| match event.id.as_ref() {
             "quit" => {
                 println!("quit menu item was clicked");
+                close_app(app);
                 app.exit(0);
             }
             "open" => {

@@ -11,6 +11,17 @@
     "store:default",
     "dialog:default",
     "fs:allow-app-write",
-    "fs:allow-app-read"
+    "fs:allow-app-read",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "args": true,
+          "name": "bin/action-manager",
+          "sidecar": true
+        }
+      ]
+    },
+    "shell:default"
   ]
 }

@@ -6,9 +6,13 @@ use axum::{
 };
 use commands::{deck_update, get_deck_url, get_state, settings_update};
 use state::AppState;
-use std::sync::{Arc, OnceLock};
+use std::{
+    fs,
+    sync::{Arc, OnceLock},
+};
 use std::{net::SocketAddr, path::Path};
 use tauri::{AppHandle, Manager, path::BaseDirectory};
+use tauri_plugin_shell::{ShellExt, process::CommandEvent};
 use tower_http::services::ServeDir;
 use websocket::{client::client, server::handle_socket};
 
@@ -39,6 +43,7 @@ pub async fn run() {
     tracing_subscriber::fmt::init();
 
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_positioner::init())
         .setup(|app| {
             let _ = build_tray(app);
@@ -48,17 +53,21 @@ pub async fn run() {
 
             app.manage(state);
 
+            start_action_manager(app.handle());
+
             let deck_path = app.path().resolve("deck", BaseDirectory::Resource)?;
             tokio::spawn(serve(using_serve_dir(&deck_path, socket_state), PORT));
 
             Ok(())
         })
         .on_window_event(|window, event| {
-            let tray_value = get_tray_value().unwrap();
-            if tray_value {
-                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                let tray_value = get_tray_value().unwrap();
+                if tray_value {
                     api.prevent_close();
                     window.hide().unwrap();
+                } else {
+                    close_app(window.app_handle());
                 }
             }
         })
@@ -81,6 +90,68 @@ pub async fn run() {
     app.run(|_, _| {});
 }
 
+pub fn close_app(app_handle: &AppHandle) {
+    if let Some(state) = app_handle.try_state::<Arc<AppState>>() {
+        let action_manager = state.action_manager.clone();
+        let mut action_manager = action_manager.lock().unwrap();
+        let child = action_manager.take().unwrap();
+        child.kill().unwrap();
+    }
+}
+
+fn start_action_manager(app: &AppHandle) {
+    let shell = app.shell();
+    let mut sidecar = shell
+        .sidecar("action-manager")
+        .map_err(|err| err.to_string())
+        .unwrap();
+
+    let app_path_buf = app.path().app_data_dir().unwrap();
+    let app_path = app_path_buf.to_str().unwrap();
+    let plugins_path = format!("{}/plugins", app_path);
+
+    if !Path::new(&plugins_path).exists()
+        && let Err(e) = fs::create_dir_all(&plugins_path)
+    {
+        tracing::error!("Couldn't create plugins folder: {}", e);
+    }
+
+    sidecar = sidecar.arg(plugins_path);
+
+    let (mut rx, child) = sidecar.spawn().map_err(|err| err.to_string()).unwrap();
+
+    if let Some(app_state) = app.try_state::<Arc<AppState>>() {
+        tracing::info!("man");
+        let mut action_manager = app_state.action_manager.lock().unwrap();
+        *action_manager = Some(child);
+    }
+
+    tauri::async_runtime::spawn(async move {
+        while let Some(event) = rx.recv().await {
+            match event {
+                CommandEvent::Stdout(data) => {
+                    if let Ok(text) = String::from_utf8(data) {
+                        let line = text.trim();
+                        println!("[sidecar] Server stdin {}", line);
+                    }
+                }
+                CommandEvent::Stderr(data) => {
+                    if let Ok(text) = String::from_utf8(data) {
+                        eprintln!("[sidecar] Server stderr {}", text.trim());
+                    }
+                }
+                CommandEvent::Terminated(code) => {
+                    println!(
+                        "[sidecar] Server terminated unexpectedly with code {:?}",
+                        code
+                    );
+                }
+                _ => {}
+            }
+        }
+    });
+}
+
 fn using_serve_dir(path: &Path, state: Arc<AppState>) -> Router {
     let client_state = state.clone();
 
@@ -88,8 +159,15 @@ fn using_serve_dir(path: &Path, state: Arc<AppState>) -> Router {
         client(client_state).await;
     });
 
+    let app = APP_HANDLE.get().unwrap();
+
+    let plugins_path = app.path().app_data_dir().unwrap().join("plugins");
+
+    dbg!(&plugins_path);
+
     Router::new()
         .nest_service("/deck", ServeDir::new(path))
+        .nest_service("/plugin", ServeDir::new(plugins_path))
         .route(
             "/ws",
             get(move |ws: WebSocketUpgrade, state: State<Arc<AppState>>| {

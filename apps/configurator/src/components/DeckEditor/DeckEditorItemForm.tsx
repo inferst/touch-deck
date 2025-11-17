@@ -22,7 +22,7 @@ type DeckEditorItemFormProps = {
 };
 
 export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
-  useLogRenders('DeckEditorItemForm');
+  useLogRenders("DeckEditorItemForm");
 
   const { cell: cell, onSave, onCancel } = props;
 
@@ -79,10 +79,7 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
                     control={form.control}
                     name="title.title"
                     render={({ field }) => (
-                      <Input
-                        className="mr-2 col-span-3 w-full"
-                        {...field}
-                      />
+                      <Input className="mr-2 col-span-3 w-full" {...field} />
                     )}
                   />
                 </div>
@@ -132,7 +129,12 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
                     )}
                   />
                 </div>
-                {cell.data && <ItemForm data={cell.data} form={form} />}
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src="http://localhost:3001/plugin/template/editor/index.html"
+                />
+                {/* {cell.data && <ItemForm data={cell.data} form={form} />} */}
               </div>
             </ScrollArea>
             <div className="grid grid-cols-4 gap-2 mt-4">
