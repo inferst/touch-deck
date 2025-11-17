@@ -93,7 +93,7 @@ export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const isEmpty = useMemo(() => !cell?.data?.type, [cell]);
+  const isEmpty = useMemo(() => !cell?.type, [cell]);
 
   const icon = useMemo(
     () => (isEmpty && isHovered ? "plus" : cell?.icon?.icon),

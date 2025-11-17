@@ -15,8 +15,12 @@ export const DeckDefaultSchema = z.object({
 async function getDeck(): Promise<Deck> {
   const deck = (await store.get("deck")) ?? {};
 
+  console.log("deck", deck);
+
   try {
     const parsed = DeckDefaultSchema.parse(deck);
+
+    console.log('parsed', parsed);
     return parsed;
   } catch (error) {
     console.error("Missing default fields", error);

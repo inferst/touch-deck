@@ -114,6 +114,7 @@ export function useStreamerbot(): StreamerbotContextValue {
   }, [options]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     connect();
 
     return () => {

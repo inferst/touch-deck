@@ -3,10 +3,6 @@ import {
   IconSchema,
   TitleSchema,
 } from "@workspace/deck/types/field";
-import {
-  StreamerbotActionSchema,
-  StreamerbotSwitchSchema,
-} from "@workspace/deck/types/streamerbot";
 import { z } from "zod";
 
 export const TextAlignSchema = z.union([
@@ -75,19 +71,13 @@ export const SpacingSchema = z.union([
 
 export type Spacing = z.infer<typeof SpacingSchema>;
 
-export const CellDataSchema = z.union([
-  StreamerbotActionSchema,
-  StreamerbotSwitchSchema,
-]);
-
-export type CellData = z.infer<typeof CellDataSchema>;
-
 export const CellSchema = z.object({
   id: z.string(),
   title: TitleSchema.optional(),
   icon: IconSchema.optional(),
   background: BackgroundSchema.optional(),
-  data: CellDataSchema.optional(),
+  type: z.string().optional(),
+  data: z.looseObject({}).optional(),
 });
 
 export type Cell = z.infer<typeof CellSchema>;

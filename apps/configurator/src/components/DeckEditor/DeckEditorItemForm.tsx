@@ -1,5 +1,4 @@
 import { IconPicker } from "@/components/DeckEditor/ItemForm/IconPicker";
-import { ItemForm } from "@/components/DeckEditor/ItemForm/ItemForm";
 import { useSettingsContext } from "@/context/SettingsContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DeckGridItem } from "@workspace/deck/components/DeckGridItem";
@@ -12,19 +11,26 @@ import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { cn } from "@workspace/ui/lib/utils";
 import { useLogRenders } from "@workspace/utils/debug";
 import { XIcon } from "lucide-react";
-import { memo } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
+
+const now = Date.now();
 
 type DeckEditorItemFormProps = {
   cell: Cell;
+  pluginUuid?: string;
   onSave: (data: Cell) => void;
   onCancel: () => void;
 };
 
 export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
-  useLogRenders('DeckEditorItemForm');
+  useLogRenders("DeckEditorItemForm");
 
-  const { cell: cell, onSave, onCancel } = props;
+  const [pluginState, setPluginState] = useState({});
+
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const { cell, pluginUuid, onSave, onCancel } = props;
 
   const settings = useSettingsContext();
 
@@ -44,7 +50,7 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
   });
 
   const handleSubmit = (data: Cell) => {
-    onSave(data);
+    onSave({ ...data, data: pluginState });
   };
 
   const handleInvalid = (errors: FieldErrors) => {
@@ -54,6 +60,34 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
   const handleCancel = () => {
     onCancel();
   };
+
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      console.log(event.data);
+
+      if (event.data.type == "data") {
+        console.log('setPluginState')
+        setPluginState(event.data.data);
+      } else if (event.data.type == "ready") {
+        const iframe = iframeRef.current;
+
+        if (iframe && iframe.contentWindow) {
+
+          console.log('parent', cell);
+          iframe.contentWindow.postMessage(
+            { type: "data", data: cell.data },
+            "http://localhost:3001",
+          );
+        }
+      }
+    };
+
+    window.addEventListener("message", onMessage);
+
+    return () => {
+      window.removeEventListener("message", onMessage);
+    };
+  }, [iframeRef, cell]);
 
   return (
     <Form {...form}>
@@ -69,7 +103,7 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
             />
           </div>
           <div className="">
-            <ScrollArea className="h-[340px] h-sm:h-[380px] h-md:h-[440px] h-md:h-[480px] pr-4">
+            <ScrollArea className="h-[340px] h-sm:h-[380px] h-md:h-[440px] pr-4">
               <div className="grid gap-2">
                 <div className="grid grid-cols-4 gap-2 items-center">
                   <Label htmlFor="title" className="block text-right">
@@ -79,10 +113,7 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
                     control={form.control}
                     name="title.title"
                     render={({ field }) => (
-                      <Input
-                        className="mr-2 col-span-3 w-full"
-                        {...field}
-                      />
+                      <Input className="mr-2 col-span-3 w-full" {...field} />
                     )}
                   />
                 </div>
@@ -132,7 +163,14 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
                     )}
                   />
                 </div>
-                {cell.data && <ItemForm data={cell.data} form={form} />}
+                {pluginUuid && (
+                  <iframe
+                    ref={iframeRef}
+                    width="100%"
+                    height="100%"
+                    src={`http://localhost:3001/plugin/${pluginUuid}/editor/index.html?actionUuid=${cell.type}&date=${now}`}
+                  />
+                )}
               </div>
             </ScrollArea>
             <div className="grid grid-cols-4 gap-2 mt-4">

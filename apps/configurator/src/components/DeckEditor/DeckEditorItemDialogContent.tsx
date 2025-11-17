@@ -1,9 +1,11 @@
 import { DeckEditorItemForm } from "@/components/DeckEditor/DeckEditorItemForm";
 import {
   DeckEditorItemSelector,
-  ItemType,
+  ItemGroup,
 } from "@/components/DeckEditor/DeckEditorItemSelector";
-import { Cell, CellData } from "@workspace/deck/types/board";
+import { usePluginsQuery } from "@/queries/plugins";
+import { Cell } from "@workspace/deck/types/board";
+import { Action, Plugins } from "@workspace/deck/types/plugin";
 import {
   FullscreenDialogDescription,
   FullscreenDialogHeader,
@@ -12,18 +14,18 @@ import {
 import { useLogRenders } from "@workspace/utils/debug";
 import { memo, useCallback, useMemo, useState } from "react";
 
-const itemTypes: ItemType[] = [
-  {
-    title: "Streamer.bot Action",
-    description: "Execute an action",
-    type: "streamerbot.action",
-  },
-  {
-    title: "Streamer.bot Switch",
-    description: "Toggle between two states",
-    type: "streamerbot.switch",
-  },
-];
+// const itemTypes: ItemType[] = [
+//   {
+//     title: "Streamer.bot Action",
+//     description: "Execute an action",
+//     type: "streamerbot.action",
+//   },
+//   {
+//     title: "Streamer.bot Switch",
+//     description: "Toggle between two states",
+//     type: "streamerbot.switch",
+//   },
+// ];
 
 export type DeckEditorItemDialogContentProps = {
   cell: Cell;
@@ -31,15 +33,43 @@ export type DeckEditorItemDialogContentProps = {
   onCancel: () => void;
 };
 
+function getActionByUuid(
+  plugins: Plugins,
+  uuid: string,
+): { action: Action; pluginUuid: string } | undefined {
+  for (const plugin of plugins.plugins) {
+    const found = plugin.actions.find((type) => type.uuid == uuid);
+
+    if (found) {
+      return { action: found, pluginUuid: plugin.uuid };
+    }
+  }
+}
+
+function getItemGroups(plugins: Plugins): ItemGroup[] {
+  return plugins.plugins.map((plugin) => {
+    return {
+      title: plugin.name,
+      itemTypes: plugin.actions.map((action) => ({
+        title: action.name,
+        description: "",
+        type: action.uuid,
+      })),
+    };
+  });
+}
+
 export const DeckEditorItemDialogContent = memo(
   (props: DeckEditorItemDialogContentProps) => {
     useLogRenders("DeckEditorItemDialogContent");
 
     const { cell, onSave, onCancel } = props;
 
-    const [selectedType, setSelectedType] = useState<CellData["type"]>();
+    const [selectedType, setSelectedType] = useState<string>();
 
-    const handleSelectType = useCallback((type: CellData["type"]) => {
+    const pluginQuery = usePluginsQuery();
+
+    const handleSelectType = useCallback((type: string) => {
       setSelectedType(type);
     }, []);
 
@@ -54,40 +84,54 @@ export const DeckEditorItemDialogContent = memo(
       onCancel();
     }, [onCancel]);
 
+    const itemType = cell.type || selectedType;
+
+    console.log('itemType', itemType);
+
+    const action = useMemo(() => {
+      return pluginQuery.data && itemType
+        ? getActionByUuid(pluginQuery.data, itemType)
+        : undefined;
+    }, [itemType, pluginQuery.data]);
+
     const title = useMemo(() => {
       if (!selectedType) {
         return "Select Item Type";
-      } else {
-        return itemTypes.find((type) => type.type == selectedType)?.title;
+      } else if (action) {
+        return action.action.name;
       }
-    }, [selectedType]);
+    }, [selectedType, action]);
 
     const item: Cell = useMemo(() => {
-      const selected = selectedType ? { type: selectedType } : undefined;
-      const data = cell.data ? cell.data : selected;
-
       return {
         ...cell,
-        data,
+        type: itemType,
       };
-    }, [cell, selectedType]);
+    }, [cell, itemType]);
 
-    const content = !item.data ? (
-      <DeckEditorItemSelector
-        itemTypes={itemTypes}
-        onSelect={handleSelectType}
-      />
-    ) : (
-      <div className="flex justify-center items-center h-full">
-        <div className="w-[500px]">
-          <DeckEditorItemForm
-            cell={item}
-            onSave={handleSave}
-            onCancel={handleCancel}
-          />
-        </div>
-      </div>
+    const itemGroups = useMemo(
+      () => (pluginQuery.data ? getItemGroups(pluginQuery.data) : []),
+      [pluginQuery.data],
     );
+
+    const content =
+      !cell.type && !selectedType ? (
+        <DeckEditorItemSelector
+          itemGroups={itemGroups}
+          onSelect={handleSelectType}
+        />
+      ) : (
+        <div className="flex justify-center items-center h-full">
+          <div className="w-[500px]">
+            <DeckEditorItemForm
+              cell={item}
+              pluginUuid={action?.pluginUuid}
+              onSave={handleSave}
+              onCancel={handleCancel}
+            />
+          </div>
+        </div>
+      );
 
     return (
       <>

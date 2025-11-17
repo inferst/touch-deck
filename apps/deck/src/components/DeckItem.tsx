@@ -17,22 +17,16 @@ export function DeckItem(props: DeckPageButtonProps) {
   const { cell, borderRadius, borderWidth, onPointerDown, onPointerUp } = props;
 
   const handlePointerUp = () => {
-    if (cell?.data?.type == "streamerbot.action") {
-      const id = cell?.data?.releaseAction?.id;
-
-      if (id) {
-        onPointerUp?.(id);
-      }
+    const id = cell?.id;
+    if (id && onPointerUp) {
+      onPointerUp(id);
     }
   };
 
   const handlePointerDown = () => {
-    if (cell?.data?.type == "streamerbot.action") {
-      const id = cell?.data?.pressAction?.id;
-
-      if (id) {
-        onPointerDown?.(id);
-      }
+    const id = cell?.id;
+    if (id && onPointerDown) {
+      onPointerDown(id);
     }
   };
 

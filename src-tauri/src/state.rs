@@ -1,6 +1,9 @@
+use std::sync::Arc;
+
 use serde::{Deserialize, Serialize};
 use tauri::Emitter;
-use tokio::sync::{Mutex, broadcast};
+use tauri_plugin_shell::process::CommandChild;
+use tokio::sync::{Mutex, broadcast, mpsc};
 
 use crate::app_handle;
 
@@ -30,12 +33,22 @@ pub struct AppData {
     pub status: SocketStatus,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ClientMessage {
+    Press{id: String, uuid: String},
+    Release{id: String, uuid: String},
+}
+
+pub type Clients = Arc<std::sync::Mutex<Vec<mpsc::UnboundedSender<ClientMessage>>>>;
+
 #[derive(Debug)]
 pub struct AppState {
     pub data: Mutex<AppData>,
     pub server_sender: broadcast::Sender<ServerMessage>,
+    pub clients: Clients,
     // Streamer.bot
     pub sb_sender: broadcast::Sender<SBMessage>,
+    pub plugin_manager: Arc<std::sync::Mutex<Option<CommandChild>>>,
 }
 
 impl AppState {
@@ -47,10 +60,14 @@ impl AppState {
             status: SocketStatus::Disconnected,
         });
 
+        let clients: Clients = Arc::new(std::sync::Mutex::new(vec![]));
+
         AppState {
             data,
             server_sender: socket_tx,
             sb_sender: sb_tx.clone(),
+            clients,
+            plugin_manager: Arc::new(std::sync::Mutex::new(None)),
         }
     }
 

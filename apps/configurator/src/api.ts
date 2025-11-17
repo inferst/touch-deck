@@ -1,6 +1,8 @@
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 
+import { Plugins } from "@workspace/deck/types/plugin";
+
 export type StreamerbotStatus = "connected" | "connecting" | "disconnected";
 
 export type ErrorEvent = {
@@ -16,6 +18,7 @@ interface API {
   emitSettingsUpdate(): Promise<unknown>;
   getStatus(): Promise<StreamerbotStatus>;
   getDeckURL(): Promise<string>;
+  getPluginsData(): Promise<Plugins>;
   onStatusUpdate(
     handler: (status: StreamerbotStatus) => void,
   ): Promise<UnlistenFn>;
@@ -34,6 +37,9 @@ class TauriAPI implements API {
   }
   getDeckURL(): Promise<string> {
     return invoke<string>("get_deck_url");
+  }
+  getPluginsData(): Promise<Plugins> {
+    return invoke<Plugins>("get_plugins_data");
   }
   onStatusUpdate(
     handler: (status: StreamerbotStatus) => void,
@@ -58,6 +64,9 @@ class LocalAPI implements API {
   }
   getStatus(): Promise<StreamerbotStatus> {
     return Promise.resolve("disconnected");
+  }
+  getPluginsData(): Promise<Plugins> {
+    return Promise.resolve({ plugins: [] });
   }
   getDeckURL(): Promise<string> {
     return Promise.resolve("http://localhost:3000/deck");

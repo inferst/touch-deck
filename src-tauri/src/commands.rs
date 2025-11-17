@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
+use std::{fs, sync::Arc};
 use tauri::{AppHandle, Emitter, Manager};
 
 use crate::{
@@ -37,6 +37,55 @@ pub async fn get_state(app: AppHandle) -> AppData {
     let state = app.state::<Arc<AppState>>();
     let guard = state.data.lock().await;
     guard.clone()
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct Action {
+    name: String,
+    uuid: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct Manifest {
+    name: String,
+    uuid: String,
+    category: String,
+    description: String,
+    actions: Vec<Action>,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct PluginsData {
+    plugins: Vec<Manifest>,
+}
+
+#[tauri::command]
+pub async fn get_plugins_data(app: AppHandle) -> PluginsData {
+    let plugins_path = app.path().app_data_dir().unwrap().join("plugins");
+
+    let mut plugins_data = PluginsData { plugins: vec![] };
+
+    if let Ok(entries) = fs::read_dir(plugins_path) {
+        for entry in entries.flatten() {
+            let mut path = entry.path();
+
+            if path.is_dir() {
+                path.push("manifest.json");
+
+                if let Ok(exists) = path.try_exists()
+                    && exists
+                    && path.is_file()
+                {
+                    let json = fs::read_to_string(path).unwrap();
+                    let manifest: Manifest = serde_json::from_str(&json).unwrap();
+
+                    plugins_data.plugins.push(manifest);
+                }
+            }
+        }
+    }
+
+    plugins_data
 }
 
 #[derive(Clone, Serialize, Deserialize)]

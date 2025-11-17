@@ -42,7 +42,7 @@ function Deck() {
 
   useEffect(() => {
     sendJsonMessage({
-      name: "getData",
+      name: "get_data",
     });
   }, [sendJsonMessage]);
 
@@ -51,7 +51,7 @@ function Deck() {
 
     if (message) {
       switch (message.name) {
-        case "getData": {
+        case "get_data": {
           const payload = message.payload as GetDataPayload;
           console.log(payload);
           // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -63,10 +63,23 @@ function Deck() {
     console.log(lastJsonMessage);
   }, [lastJsonMessage]);
 
-  const handleAction = async (id: string) => {
+  const handlePointerDown = async (id: string) => {
     sendJsonMessage({
-      name: "doAction",
-      payload: id,
+      name: "press",
+      data: {
+        id,
+        uuid: "press uuid"
+      },
+    });
+  };
+
+  const handlePointerUp = async (id: string) => {
+    sendJsonMessage({
+      name: "release",
+      data: {
+        id,
+        uuid: "release uuid"
+      },
     });
   };
 
@@ -133,8 +146,8 @@ function Deck() {
                   <DeckItem
                     cell={cell}
                     borderRadius={data.settings.style.borderRadius}
-                    onPointerDown={handleAction}
-                    onPointerUp={handleAction}
+                    onPointerDown={handlePointerDown}
+                    onPointerUp={handlePointerUp}
                   />
                 )
               );
@@ -162,7 +175,10 @@ function Deck() {
             >
               <ChevronUp className="size-6" />
             </Button>
-            <Button variant={"outline"} className="size-10 text-2xl border-none">
+            <Button
+              variant={"outline"}
+              className="size-10 text-2xl border-none"
+            >
               {pageNumber + 1}
             </Button>
             <Button
