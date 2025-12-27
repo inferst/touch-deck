@@ -16,10 +16,17 @@ use tauri_plugin_shell::{ShellExt, process::CommandEvent};
 use tower_http::services::ServeDir;
 use websocket::{client::client, server::handle_socket};
 
-use crate::{settings::get_tray_value, tray::build_tray};
+use crate::{
+    database::{DB_POOL, init_db, run_migrations},
+    models::ProfilePage,
+    settings::get_tray_value,
+    tray::build_tray,
+};
 
 mod commands;
+mod database;
 mod get_ip;
+mod models;
 mod settings;
 mod state;
 mod tray;
@@ -41,6 +48,36 @@ pub fn app_handle<'a>() -> &'a AppHandle {
 #[tokio::main]
 pub async fn run() {
     tracing_subscriber::fmt::init();
+
+    init_db().await;
+    run_migrations().await;
+
+    let connection = DB_POOL.get().unwrap();
+
+    // let q = "SELECT id, name FROM profile";
+    // let profiles = sqlx::query_as::<_, Profile>(q)
+    //     .fetch_all(connection)
+    //     .await
+    //     .unwrap();
+
+    let profiles = sqlx::query_as!(
+        ProfilePage,
+        r#"
+        SELECT
+            profile.id as id,
+            profile.name as name,
+            page.id as page_id,
+            page.name as page_name,
+            page.icon as page_icon
+        FROM profile
+        INNER JOIN page ON profile.id = page.profile_id
+        "#
+    )
+    .fetch_all(connection)
+    .await
+    .unwrap();
+
+    dbg!(profiles);
 
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())

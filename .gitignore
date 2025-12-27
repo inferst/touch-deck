@@ -29,3 +29,7 @@ dist-ssr
 .cache
 server/dist
 public/dist
+
+database.db
+database.db-shm
+database.db-wal
