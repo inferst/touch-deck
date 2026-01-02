@@ -1,7 +1,7 @@
 use std::{error::Error, sync::OnceLock};
 
 use tauri::{
-    App, Manager,
+    AppHandle, Manager,
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent, TrayIconId},
 };
@@ -10,7 +10,7 @@ use crate::{close_app, settings::get_tray_value};
 
 pub static TRAY_ID: OnceLock<TrayIconId> = OnceLock::new();
 
-pub fn build_tray(app: &mut App) -> Result<(), Box<dyn Error>> {
+pub fn build_tray(app: &AppHandle) -> Result<(), Box<dyn Error>> {
     let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
     let open_item = MenuItem::with_id(app, "open", "Open", true, None::<&str>)?;
 

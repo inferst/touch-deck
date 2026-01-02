@@ -38,6 +38,8 @@
     "resources": {
       "../apps/deck/dist": "deck/"
     },
-    "externalBin": ["./bin/plugin-manager"]
+    "externalBin": [
+      "./bin/plugin-manager"
+    ]
   }
 }

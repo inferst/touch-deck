@@ -1,83 +1,99 @@
--- Add up migration script here
-
 CREATE TABLE IF NOT EXISTS "profile" (
-	"id" INTEGER NOT NULL UNIQUE,
+	"id" INTEGER NOT NULL,
 	"name" VARCHAR NOT NULL,
 	PRIMARY KEY("id")
 );
 
 CREATE TABLE IF NOT EXISTS "board" (
-	"id" INTEGER NOT NULL UNIQUE,
-	"page_id" INTEGER NOT NULL,
+	"id" INTEGER NOT NULL,
+	"profile_id" INTEGER NOT NULL,
 	"rows" INTEGER NOT NULL,
 	"columns" INTEGER NOT NULL,
-	PRIMARY KEY("id"),
-	FOREIGN KEY ("page_id") REFERENCES "page"("id")
-	ON UPDATE NO ACTION ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS "page" (
-	"id" INTEGER NOT NULL UNIQUE,
-	"profile_id" INTEGER NOT NULL,
-	"name" VARCHAR,
-	"icon" VARCHAR,
 	PRIMARY KEY("id"),
 	FOREIGN KEY ("profile_id") REFERENCES "profile"("id")
 	ON UPDATE NO ACTION ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS "item" (
-	"id" INTEGER NOT NULL UNIQUE,
+CREATE TABLE IF NOT EXISTS "page" (
 	"board_id" INTEGER NOT NULL,
-	"type_uuid" VARCHAR NOT NULL,
-	"row" INTEGER NOT NULL,
-	"column" INTEGER NOT NULL,
-	"data" TEXT NOT NULL,
-	"color" VARCHAR,
-	PRIMARY KEY("id"),
+	"position" INTEGER NOT NULL,
+	"name" VARCHAR,
+	"icon" VARCHAR,
+	PRIMARY KEY("board_id", "position"),
 	FOREIGN KEY ("board_id") REFERENCES "board"("id")
-	ON UPDATE NO ACTION ON DELETE CASCADE,
-	FOREIGN KEY ("type_id") REFERENCES "type"("id")
-	ON UPDATE NO ACTION ON DELETE NO ACTION
+	ON UPDATE NO ACTION ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS "item" (
+	"id" INTEGER NOT NULL,
+	"board_id" INTEGER NOT NULL,
+	"row" INTEGER NOT NULL,
+	"column" INTEGER NOT NULL,
+	PRIMARY KEY("id"),
+	FOREIGN KEY ("board_id") REFERENCES "board"("id")
+	ON UPDATE NO ACTION ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "item_index_board_row_column"
+ON "item" ("board_id", "row", "column");
 CREATE TABLE IF NOT EXISTS "title" (
-	"id" INTEGER NOT NULL UNIQUE,
 	"item_id" INTEGER NOT NULL,
 	"font_id" INTEGER NOT NULL,
 	"title" VARCHAR,
 	"align" INTEGER,
 	"color" VARCHAR,
 	"size" INTEGER,
-	PRIMARY KEY("id"),
+	PRIMARY KEY("item_id"),
 	FOREIGN KEY ("item_id") REFERENCES "item"("id")
 	ON UPDATE NO ACTION ON DELETE CASCADE,
-	FOREIGN KEY ("font_id") REFERENCES "fonts"("id")
-	ON UPDATE NO ACTION ON DELETE NO ACTION
+	FOREIGN KEY ("font_id") REFERENCES "font"("id")
+	ON UPDATE NO ACTION ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "image" (
-	"id" INTEGER NOT NULL UNIQUE,
 	"item_id" INTEGER NOT NULL,
 	"file_name" VARCHAR NOT NULL,
 	"file_type" VARCHAR NOT NULL,
-	PRIMARY KEY("id"),
+	PRIMARY KEY("item_id"),
 	FOREIGN KEY ("item_id") REFERENCES "item"("id")
 	ON UPDATE NO ACTION ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "font" (
-	"id" INTEGER NOT NULL UNIQUE,
+	"id" INTEGER NOT NULL,
 	"name" VARCHAR NOT NULL,
 	PRIMARY KEY("id")
 );
 
 CREATE TABLE IF NOT EXISTS "icon" (
-	"id" INTEGER NOT NULL UNIQUE,
 	"item_id" INTEGER NOT NULL,
 	"name" VARCHAR NOT NULL,
 	"color" VARCHAR,
-	PRIMARY KEY("id"),
+	PRIMARY KEY("item_id"),
 	FOREIGN KEY ("item_id") REFERENCES "item"("id")
 	ON UPDATE NO ACTION ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "color" (
+	"item_id" INTEGER NOT NULL,
+	"color" VARCHAR,
+	PRIMARY KEY("item_id"),
+	FOREIGN KEY ("item_id") REFERENCES "item"("id")
+	ON UPDATE NO ACTION ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "plugin_item" (
+	"item_id" INTEGER NOT NULL,
+	"uuid" VARCHAR NOT NULL,
+	"settings" TEXT,
+	PRIMARY KEY("item_id", "uuid"),
+	FOREIGN KEY ("item_id") REFERENCES "item"("id")
+	ON UPDATE NO ACTION ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "plugin" (
+	"id" INTEGER NOT NULL,
+	"uuid" VARCHAR NOT NULL UNIQUE,
+	"settings" TEXT,
+	PRIMARY KEY("id")
 );

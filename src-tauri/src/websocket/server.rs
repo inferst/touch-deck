@@ -76,6 +76,12 @@ pub async fn handle_socket(
                     let mut sender = socket_sender.lock().await;
                     let _ = sender.send(Message::Text(json.into())).await;
                 }
+                ClientMessage::GetActionSettigns { id } => {
+
+                }
+                ClientMessage::SetActionSettings { id } => {
+
+                }
             }
         }
     });

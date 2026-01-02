@@ -57,7 +57,7 @@ pub fn default_port() -> u16 {
 }
 
 pub fn default_endpoint() -> String {
-    "/".to_string()
+    "/".into()
 }
 
 pub fn get_deck() -> Value {
@@ -72,6 +72,10 @@ pub fn get_streamerbot_settings() -> serde_json::Result<Streamerbot> {
     let value = store().get("settings").unwrap_or(Value::Object(Map::new()));
     let settings: Settings = from_value(value)?;
     Ok(settings.connection.streamerbot)
+}
+
+pub fn set_action_settings(action_setings: Value) {
+    let value = store().get("settings").unwrap_or(Value::Object(Map::new()));
 }
 
 pub fn get_tray_value() -> serde_json::Result<bool> {

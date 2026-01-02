@@ -37,6 +37,8 @@ pub struct AppData {
 pub enum ClientMessage {
     Press{id: String, uuid: String},
     Release{id: String, uuid: String},
+    SetActionSettings{id: String},
+    GetActionSettigns{id: String},
 }
 
 pub type Clients = Arc<std::sync::Mutex<Vec<mpsc::UnboundedSender<ClientMessage>>>>;

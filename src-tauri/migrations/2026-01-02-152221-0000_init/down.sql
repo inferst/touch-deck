@@ -1,11 +1,11 @@
--- Add down migration script here
-
 DROP TABLE profile;
 DROP TABLE board;
 DROP TABLE page;
 DROP TABLE item;
 DROP TABLE title;
 DROP TABLE image;
-DROP TABLE fonts;
+DROP TABLE font;
 DROP TABLE icon;
-DROP TABLE type;
+DROP TABLE color;
+DROP TABLE plugin;
+DROP TABLE plugin_action;

@@ -10,6 +10,8 @@ use crate::{
     tray::TRAY_ID,
 };
 
+pub mod repository;
+
 #[tauri::command]
 pub async fn deck_update(app: AppHandle) {
     let state = app.state::<Arc<AppState>>();
