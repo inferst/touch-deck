@@ -1,7 +1,11 @@
 import { useDebounce } from "@workspace/utils/debounce";
 import { useCallback, useEffect, useId, useRef } from "react";
 
-export function useLogRenders(componentName: string) {
+export type LogOptions = {
+  immediately: boolean;
+};
+
+export function useLogRenders(componentName: string, options?: LogOptions) {
   const renderCount = useRef(0);
   const freshRenderCount = useRef(0);
 
@@ -16,7 +20,7 @@ export function useLogRenders(componentName: string) {
     freshRenderCount.current = 0;
   }, [id, renderCount, componentName]);
 
-  const debouncedDebug = useDebounce(debug, 100);
+  const debouncedDebug = options?.immediately ? debug : useDebounce(debug, 100);
 
   useEffect(() => {
     renderCount.current += 1;

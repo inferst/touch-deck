@@ -1,6 +1,10 @@
-import { useDeckMutation } from "@/mutations/deck";
-import { useDeckQuery } from "@/queries/deck";
+import {
+  useCreateBoardMutation,
+  useDeleteBoardMutation,
+} from "@/mutations/board";
+import { usePagesQuery } from "@/queries/page";
 import { confirm } from "@tauri-apps/plugin-dialog";
+import { PageDto } from "@workspace/deck/dto/PageDto";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonGroup } from "@workspace/ui/components/button-group";
 import {
@@ -17,71 +21,76 @@ import { EllipsisIcon, PlusIcon } from "lucide-react";
 import { memo } from "react";
 
 type PagesProps = {
-  selectedPageNumber: number;
-  onPageChange: (pageNumber: number) => void;
+  selectedBoardId: number;
+  onSelectedBoardChange: (id: number) => void;
 };
 
 export const Pages = memo((props: PagesProps) => {
-  useLogRenders('Pages');
+  useLogRenders("Pages");
 
-  const deckQuery = useDeckQuery();
-  const deckMutation = useDeckMutation();
+  const { selectedBoardId, onSelectedBoardChange } = props;
 
-  if (deckQuery.isPending || deckQuery.isError) {
+  const pagesQuery = usePagesQuery(1);
+
+  const createBoardMutation = useCreateBoardMutation();
+  const deleteBoardMutation = useDeleteBoardMutation();
+
+  if (pagesQuery.isPending || pagesQuery.isError) {
     return "Loading";
   }
 
   const handleAdd = () => {
-    deckMutation.mutate({
-      ...deckQuery.data,
-      pages: [
-        ...deckQuery.data.pages,
-        {
-          id: crypto.randomUUID(),
-          board: {},
+    createBoardMutation.mutate({
+      board: {
+        board: {
+          profileId: 1,
         },
-      ],
+      },
+      createPage: true,
     });
   };
 
-  const handlePageClick = (page: number) => {
-    props.onPageChange(page);
+  const handlePageClick = (id: number) => {
+    onSelectedBoardChange(id);
   };
 
   const handleDelete = async () => {
-    const id = deckQuery.data?.pages[props.selectedPageNumber]?.id;
+    const answer = await confirm(
+      "This action cannot be reverted. Are you sure?",
+      {
+        title: `Delete page`,
+        kind: "warning",
+      },
+    );
 
-    if (id) {
-      const answer = await confirm(
-        "This action cannot be reverted. Are you sure?",
-        {
-          title: `Delete page`,
-          kind: "warning",
-        },
-      );
+    if (answer) {
+      let prevPage: PageDto | undefined;
 
-      if (answer) {
-        deckMutation.mutate({
-          ...deckQuery.data,
-          pages: deckQuery.data.pages.filter((page) => page.id != id),
-        });
+      for (let index = pagesQuery.data.length - 1; index >= 0; index--) {
+        if (pagesQuery.data[index]?.page.boardId == selectedBoardId) {
+          prevPage = pagesQuery.data[index - 1];
+        }
+      }
 
-        props.onPageChange(props.selectedPageNumber - 1);
+      deleteBoardMutation.mutate(selectedBoardId);
+
+      if (prevPage) {
+        onSelectedBoardChange(prevPage.page.boardId);
       }
     }
   };
 
-  const pages = deckQuery.data.pages.map((page, index) => {
+  const pages = pagesQuery.data.map((page) => {
     return (
       <Button
-        key={page.id}
-        onClick={() => handlePageClick(index)}
-        variant={props.selectedPageNumber == index ? "secondary" : "outline"}
+        key={page.page.boardId}
+        onClick={() => handlePageClick(page.page.boardId)}
+        variant={selectedBoardId == page.page.boardId ? "secondary" : "outline"}
         className={cn({
-          "border dark:border-input": props.selectedPageNumber == index,
+          "border dark:border-input": selectedBoardId == page.page.boardId,
         })}
       >
-        {index + 1}
+        {page.page.position + 1}
       </Button>
     );
   });
@@ -94,7 +103,7 @@ export const Pages = memo((props: PagesProps) => {
           onClick={handleAdd}
           variant={"outline"}
           size={"icon"}
-          disabled={deckQuery.data.pages.length >= 9}
+          disabled={pagesQuery.data.length >= 9}
         >
           <PlusIcon />
         </Button>
@@ -111,7 +120,7 @@ export const Pages = memo((props: PagesProps) => {
           <DropdownMenuGroup>
             <DropdownMenuItem
               onClick={handleDelete}
-              disabled={props.selectedPageNumber == 0}
+              disabled={selectedBoardId == 0}
             >
               Delete
             </DropdownMenuItem>

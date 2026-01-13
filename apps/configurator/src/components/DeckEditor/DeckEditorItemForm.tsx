@@ -1,8 +1,8 @@
 import { IconPicker } from "@/components/DeckEditor/ItemForm/IconPicker";
-import { useSettingsContext } from "@/context/SettingsContext";
+import { useStyleQuery } from "@/queries/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DeckGridItem } from "@workspace/deck/components/DeckGridItem";
-import { Cell, CellSchema } from "@workspace/deck/types/board";
+import { BorderRadius, Cell, CellSchema } from "@workspace/deck/types/board";
 import { Button } from "@workspace/ui/components/button";
 import { Form, FormField } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
@@ -11,7 +11,7 @@ import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { cn } from "@workspace/ui/lib/utils";
 import { useLogRenders } from "@workspace/utils/debug";
 import { XIcon } from "lucide-react";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
 
 const now = Date.now();
@@ -26,13 +26,14 @@ type DeckEditorItemFormProps = {
 export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
   useLogRenders("DeckEditorItemForm");
 
-  const [pluginState, setPluginState] = useState({});
+  // const [pluginState, setPluginState] = useState({});
+
+  // const setActionMutation = useSetActionMutation();
+  const styleQuery = useStyleQuery(1);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const { cell, pluginUuid, onSave, onCancel } = props;
-
-  const settings = useSettingsContext();
 
   const form = useForm<Cell>({
     resolver: zodResolver(CellSchema),
@@ -50,7 +51,8 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
   });
 
   const handleSubmit = (data: Cell) => {
-    onSave({ ...data, data: pluginState });
+    console.log(data);
+    onSave({ ...data });
   };
 
   const handleInvalid = (errors: FieldErrors) => {
@@ -66,18 +68,17 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
       console.log(event.data);
 
       if (event.data.type == "data") {
-        console.log('setPluginState')
-        setPluginState(event.data.data);
+        console.log("setPluginState");
+        // setPluginState(event.data.data);
       } else if (event.data.type == "ready") {
         const iframe = iframeRef.current;
 
         if (iframe && iframe.contentWindow) {
-
-          console.log('parent', cell);
-          iframe.contentWindow.postMessage(
-            { type: "data", data: cell.data },
-            "http://localhost:3001",
-          );
+          console.log("parent", cell);
+          // iframe.contentWindow.postMessage(
+          //   { type: "data", data: cell.data },
+          //   "http://localhost:3001",
+          // );
         }
       }
     };
@@ -98,7 +99,7 @@ export const DeckEditorItemForm = memo((props: DeckEditorItemFormProps) => {
               text={title?.title}
               backgroundColor={background?.color}
               icon={icon?.icon}
-              borderRadius={settings.style.borderRadius}
+              borderRadius={styleQuery.data.style.borderRadius as BorderRadius}
               borderWidth={2}
             />
           </div>

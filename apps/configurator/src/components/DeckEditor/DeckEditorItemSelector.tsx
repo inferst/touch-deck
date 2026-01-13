@@ -13,7 +13,7 @@ import {
 } from "@workspace/ui/components/item";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { ArrowRightIcon, Search } from "lucide-react";
-import { memo, useMemo, useState } from "react";
+import { Fragment, memo, useMemo, useState } from "react";
 
 export type ItemGroup = {
   title: string;
@@ -68,7 +68,7 @@ export const DeckEditorItemSelector = memo(
             </div>
             <div className="mt-12">
               {filteredGroups.map((group) => (
-                <>
+                <Fragment key={group.title}>
                   <div className="mt-4 mb-2">{group.title}</div>
                   <ItemGroup className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-2">
                     {group.itemTypes.map((item) => (
@@ -94,7 +94,7 @@ export const DeckEditorItemSelector = memo(
                       </Item>
                     ))}
                   </ItemGroup>
-                </>
+                </Fragment>
               ))}
             </div>
           </div>

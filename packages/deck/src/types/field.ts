@@ -7,6 +7,7 @@ export const TitleSchema = z.object({
   align: z
     .union([z.literal("top"), z.literal("middle"), z.literal("bottom")])
     .optional(),
+  size: z.number().optional(),
 });
 
 export type Title = z.infer<typeof TitleSchema>;

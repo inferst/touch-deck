@@ -16,7 +16,7 @@ pub fn get_ip() -> Result<String, Error> {
     let list = list_afinet_netifas()?;
 
     let ip = list
-        .into_iter()
+        .iter()
         .find(|(_, ip)| ip.to_string().starts_with("192.168."));
 
     match ip {

@@ -5,6 +5,10 @@ description = "Stream Deck Killer"
 authors = ["MikeRime"]
 edition = "2024"
 
+[workspace]
+resolver = "3"
+members = ["crates/server", "crates/database"]
+
 [lib]
 name = "touch_deck_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
@@ -13,33 +17,38 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
+server = { path = "./crates/server/" }
+database = { path = "./crates/database/" }
 tauri = { version = "2", features = ["devtools", "tray-icon"] }
+tauri-plugin-fs = "2"
+tauri-plugin-store = "2"
+tauri-plugin-dialog = "2"
 tauri-plugin-opener = "2"
 tauri-plugin-positioner = { version = "2.0.0", features = ["tray-icon"] }
+tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-
 tracing = "0.1"
 tracing-subscriber = "0.3"
-
 tokio = { version = "1", features = ["full"] }
 axum = { version = "0.8.1", features = ["ws"] }
 tower = "0.5"
 tower-http = { version = "0.6.2", features = ["fs"] }
-tauri-plugin-fs = "2"
-tauri-plugin-store = "2"
-tauri-plugin-dialog = "2"
 futures = "0.3.31"
-tokio-tungstenite = "0.28.0"
 local-ip-address = "0.6.5"
 thiserror = "2.0.12"
-tauri-plugin-shell = "2"
 diesel = { version = "2.3.5", features = [
   "sqlite",
   "r2d2",
   "returning_clauses_for_sqlite_3_35",
 ] }
-deadpool-diesel = { version = "0.6.1", features = ["sqlite"] }
+ts-rs = "11.1"
 
-[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
-tauri-plugin-positioner = "2"
+[profile.dev]
+incremental = true
+opt-level = 0
+debug = true
+
+[profile.dev.package."*"]
+opt-level = 1
+debug = false

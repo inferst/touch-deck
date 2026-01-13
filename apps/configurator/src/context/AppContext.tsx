@@ -1,24 +1,13 @@
-import { listen, UnlistenFn } from "@tauri-apps/api/event";
-import { isTauri } from "@tauri-apps/api/core";
-import { createContext, useContext, useEffect, useState } from "react";
-import { api } from "@/api";
+import { usePagesQuery } from "@/queries/page";
+import { Page } from "@workspace/deck/dto/Page";
+import { createContext, useContext, useMemo, useState } from "react";
 
-export type AppState = {
-  status: StreamerbotStatus;
+type AppData = {
+  pages: Page[];
+  selectedBoardId: number;
 };
 
-export type ErrorEvent = {
-  message: string;
-};
-
-export type StreamerbotStatus = "connected" | "connecting" | "disconnected";
-
-export type AppContextValue = {
-  status: StreamerbotStatus;
-  error: string;
-};
-
-export const AppContext = createContext<AppContextValue | undefined>(undefined);
+export const AppContext = createContext<AppData | undefined>(undefined);
 
 export const useAppContext = () => {
   const context = useContext(AppContext);
@@ -33,33 +22,24 @@ export const useAppContext = () => {
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [state, setState] = useState<AppContextValue>({
-    status: "disconnected",
-    error: "",
-  });
+  const query = usePagesQuery(1);
 
-  useEffect(() => {
-    let listeners: Promise<UnlistenFn>[] = [];
+  const [selectedBoardId, setSelectedBoardId] = useState(0);
 
-    if (isTauri()) {
-      listeners = [
-        listen<AppState>("state_update", (event) => {
-          setState((state) => ({ ...state, status: event.payload.status }));
-        }),
-        listen<ErrorEvent>("error", (event) => {
-          setState((state) => ({ ...state, error: event.payload.message }));
-        }),
-      ];
-
-      api.getStatus().then((status) => {
-        setState((state) => ({ ...state, status }));
-      });
-    }
-
-    return () => {
-      listeners.map((listener) => listener.then((unlisten) => unlisten()));
+  const value = useMemo(() => {
+    return {
+      pages: query.data?.map((data) => data.page) ?? [],
+      selectedBoardId,
     };
-  }, []);
+  }, [query.data, selectedBoardId]);
 
-  return <AppContext.Provider value={state}>{children}</AppContext.Provider>;
+  if (query.isPending) {
+    return "Loading...";
+  }
+
+  if (query.isError) {
+    return query.error.message;
+  }
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

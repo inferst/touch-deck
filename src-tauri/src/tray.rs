@@ -1,64 +1,84 @@
 use std::{error::Error, sync::OnceLock};
 
 use tauri::{
-    AppHandle, Manager,
-    menu::{Menu, MenuItem},
-    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent, TrayIconId},
+    AppHandle, Manager, Wry,
+    menu::{Menu, MenuEvent, MenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent, TrayIconId},
 };
 
-use crate::{close_app, settings::get_tray_value};
+use crate::{plugin_loader::stop, settings::get_tray_value};
 
 pub static TRAY_ID: OnceLock<TrayIconId> = OnceLock::new();
 
-pub fn build_tray(app: &AppHandle) -> Result<(), Box<dyn Error>> {
+pub fn build(app: &AppHandle) -> Result<(), Box<dyn Error>> {
     let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
     let open_item = MenuItem::with_id(app, "open", "Open", true, None::<&str>)?;
 
     let menu = Menu::with_items(app, &[&open_item, &quit_item])?;
 
-    let tray = TrayIconBuilder::new()
-        .menu(&menu)
-        .on_tray_icon_event(|tray, event| {
+    let on_tray_icon_event =
+        |tray: &TrayIcon<Wry>, event: TrayIconEvent| -> Result<(), Box<dyn Error>> {
             if let TrayIconEvent::Click {
                 button: MouseButton::Left,
                 button_state: MouseButtonState::Up,
                 ..
             } = event
             {
-                println!("left click pressed and released");
                 let app = tray.app_handle();
+
                 if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.unminimize();
-                    let _ = window.show();
-                    let _ = window.set_focus();
+                    window.unminimize()?;
+                    window.show()?;
+                    window.set_focus()?;
                 }
             }
-        })
-        .on_menu_event(|app, event| match event.id.as_ref() {
+
+            Ok(())
+        };
+
+    let on_menu_event = |app: &AppHandle, event: MenuEvent| -> Result<(), Box<dyn Error>> {
+        match event.id.as_ref() {
             "quit" => {
-                println!("quit menu item was clicked");
-                close_app(app);
+                stop(app)?;
                 app.exit(0);
             }
             "open" => {
-                println!("open menu item was clicked");
                 if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.unminimize();
-                    let _ = window.show();
-                    let _ = window.set_focus();
+                    window.unminimize()?;
+                    window.show()?;
+                    window.set_focus()?;
                 }
             }
-            _ => {
-                println!("menu item {:?} not handled", event.id);
+            _ => {}
+        }
+
+        Ok(())
+    };
+
+    let mut tray_builder = TrayIconBuilder::new()
+        .menu(&menu)
+        .on_tray_icon_event(move |tray, event| {
+            if let Err(error) = on_tray_icon_event(tray, event) {
+                tracing::error!("tray icon event error: {}", error);
             }
         })
-        .icon(app.default_window_icon().unwrap().clone())
-        .build(app)?;
+        .on_menu_event(move |app, event| {
+            if let Err(error) = on_menu_event(app, event) {
+                tracing::error!("menu event error: {}", error);
+            }
+        });
+
+    if let Some(icon) = app.default_window_icon() {
+        tray_builder = tray_builder.icon(icon.clone());
+    }
+
+    let tray = tray_builder.build(app)?;
 
     TRAY_ID.set(tray.id().clone()).unwrap();
 
-    let tray_value = get_tray_value().unwrap();
-    tray.set_visible(tray_value).unwrap();
+    // TODO: Refactor settings
+    let tray_value = get_tray_value()?;
+    tray.set_visible(tray_value)?;
 
     Ok(())
 }

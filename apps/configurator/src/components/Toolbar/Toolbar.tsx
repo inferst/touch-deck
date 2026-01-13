@@ -6,15 +6,15 @@ import { SettingsIcon } from "lucide-react";
 import { memo } from "react";
 
 export type ToolbarProps = {
-  selectedPageNumber: number;
-  onPageChange: (pageNumber: number) => void;
+  selectedBoardId: number;
+  onSelectedBoardChange: (id: number) => void;
   onSidebarToggle: () => void;
 };
 
 export const Toolbar = memo((props: ToolbarProps) => {
-  useLogRenders('Toolbar');
+  useLogRenders("Toolbar");
 
-  const { selectedPageNumber, onPageChange, onSidebarToggle } = props;
+  const { selectedBoardId, onSelectedBoardChange, onSidebarToggle } = props;
 
   return (
     <div
@@ -33,11 +33,16 @@ export const Toolbar = memo((props: ToolbarProps) => {
     >
       <div className={cn("grow")}>
         <Pages
-          selectedPageNumber={selectedPageNumber}
-          onPageChange={onPageChange}
+          selectedBoardId={selectedBoardId}
+          onSelectedBoardChange={onSelectedBoardChange}
         />
       </div>
-      <Button variant={'secondary'} size={"icon"} className={cn("mt-2")} onClick={onSidebarToggle}>
+      <Button
+        variant={"secondary"}
+        size={"icon"}
+        className={cn("mt-2")}
+        onClick={onSidebarToggle}
+      >
         <SettingsIcon />
       </Button>
     </div>

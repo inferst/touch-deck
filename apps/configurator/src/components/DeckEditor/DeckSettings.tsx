@@ -1,10 +1,13 @@
-import { useDeckContext } from "@/context/DeckContext";
-import { useDeckMutation } from "@/mutations/deck";
+import { useSetLayoutMutation, useSetStyleMutation } from "@/mutations/profile";
+import { useLayoutQuery, useStyleQuery } from "@/queries/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { open, save } from "@tauri-apps/plugin-dialog";
-import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
-import { DeckSettingsSchema } from "@workspace/deck/types/board";
-import { Button } from "@workspace/ui/components/button";
+import {
+  BorderRadius,
+  ColumnsCount,
+  DeckSettingsSchema,
+  RowsCount,
+  Spacing,
+} from "@workspace/deck/types/board";
 import { Form, FormField } from "@workspace/ui/components/form";
 import { Label } from "@workspace/ui/components/label";
 import {
@@ -18,13 +21,12 @@ import {
 import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 import { useLogRenders } from "@workspace/utils/debug";
-import { ImportIcon, XIcon } from "lucide-react";
-import { memo, useCallback, useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { XIcon } from "lucide-react";
+import { memo, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import z from "zod";
 
 export const DeckEditorSettingsFormSchema = DeckSettingsSchema.pick({
-  tray: true,
   layout: true,
   style: true,
 });
@@ -36,67 +38,95 @@ export type DeckEditorSettingsFormData = z.infer<
 const columnsArr = [2, 3, 4, 5, 6, 7, 8];
 const rowsArr = [2, 3, 4, 5, 6, 7, 8];
 
-export type DeckEditorSettingsProps = {
-  data: DeckEditorSettingsFormData;
-  onChange: (data: DeckEditorSettingsFormData) => void;
-};
+export const DeckEditorSettings = memo(() => {
+  useLogRenders("DeckEditorSettings", { immediately: true });
 
-export const DeckEditorSettings = memo((props: DeckEditorSettingsProps) => {
-  useLogRenders('DeckEditorSettings');
+  const layout = useLayoutQuery(1);
+  const style = useStyleQuery(1);
 
-  const { data, onChange } = props;
-
-  const deck = useDeckContext();
-  const deckMutation = useDeckMutation();
+  const layoutMutation = useSetLayoutMutation();
+  const styleMutation = useSetStyleMutation();
 
   const form = useForm<DeckEditorSettingsFormData>({
     resolver: zodResolver(DeckEditorSettingsFormSchema),
-    defaultValues: data,
+    defaultValues: {
+      layout: {
+        rows: layout.data.layout.rows as RowsCount,
+        columns: layout.data.layout.cols as ColumnsCount,
+      },
+      style: {
+        spacing: style.data.style.spacing as Spacing,
+        borderRadius: style.data.style.borderRadius as BorderRadius,
+      },
+    },
+    mode: "onChange",
   });
 
-  const values = useWatch<DeckEditorSettingsFormData>({
-    control: form.control,
-  });
-
-  const handleImport = useCallback(async () => {
-    const path = await open({
-      filters: [
-        {
-          name: "Json Filter",
-          extensions: ["json"],
-        },
-      ],
-    });
-
-    if (path) {
-      const contents = await readTextFile(path);
-      const json = JSON.parse(contents);
-
-      deckMutation.mutate(json);
-    }
-  }, [deckMutation]);
-
-  const handleExport = useCallback(async () => {
-    const path = await save({
-      filters: [
-        {
-          name: "Json Filter",
-          extensions: ["json"],
-        },
-      ],
-    });
-
-    if (path) {
-      const contents = JSON.stringify(deck);
-      await writeTextFile(path, contents);
-    }
-  }, [deck]);
+  // const handleImport = useCallback(async () => {
+  //   const path = await open({
+  //     filters: [
+  //       {
+  //         name: "Json Filter",
+  //         extensions: ["json"],
+  //       },
+  //     ],
+  //   });
+  //
+  //   if (path) {
+  //     const contents = await readTextFile(path);
+  //     const json = JSON.parse(contents);
+  //
+  //     deckMutation.mutate(json);
+  //   }
+  // }, [deckMutation]);
+  //
+  // const handleExport = useCallback(async () => {
+  //   const path = await save({
+  //     filters: [
+  //       {
+  //         name: "Json Filter",
+  //         extensions: ["json"],
+  //       },
+  //     ],
+  //   });
+  //
+  //   if (path) {
+  //     const contents = JSON.stringify(deck);
+  //     await writeTextFile(path, contents);
+  //   }
+  // }, [deck]);
 
   useEffect(() => {
-    console.log("onChange", values);
-    const parsed = DeckEditorSettingsFormSchema.parse(values);
-    onChange(parsed);
-  }, [values, onChange]);
+    const subscription = form.watch(() => {
+      setTimeout(() => {
+        if (form.formState.isValid) {
+          const parsed = DeckEditorSettingsFormSchema.parse(form.getValues());
+
+          layoutMutation.mutate({
+            layout: {
+              profileId: 1,
+              rows: parsed.layout.rows,
+              cols: parsed.layout.columns,
+            },
+          });
+
+          styleMutation.mutate({
+            style: {
+              profileId: 1,
+              spacing: parsed.style.spacing,
+              borderRadius: parsed.style.borderRadius,
+              backgroundColor: null,
+              backgroundImage: null,
+            },
+          });
+        }
+      }, 0);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [form.watch, form.formState.isValid, layoutMutation, styleMutation]);
 
   return (
     <Form {...form}>
@@ -109,7 +139,7 @@ export const DeckEditorSettings = memo((props: DeckEditorSettingsProps) => {
           render={({ field }) => (
             <Select
               value={field.value.toString()}
-              onValueChange={(value) => field.onChange(Number(value))}
+              onValueChange={(value: string) => field.onChange(Number(value))}
             >
               <SelectTrigger className="w-40 mr-2">
                 <SelectValue placeholder="Rows" />
@@ -135,7 +165,7 @@ export const DeckEditorSettings = memo((props: DeckEditorSettingsProps) => {
           render={({ field }) => (
             <Select
               value={field.value.toString()}
-              onValueChange={(value) => field.onChange(Number(value))}
+              onValueChange={(value: string) => field.onChange(Number(value))}
             >
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Columns" />
@@ -161,7 +191,7 @@ export const DeckEditorSettings = memo((props: DeckEditorSettingsProps) => {
           render={({ field }) => (
             <Select
               value={(field.value ?? 0).toString()}
-              onValueChange={(value) => field.onChange(Number(value))}
+              onValueChange={(value: string) => field.onChange(Number(value))}
             >
               <SelectTrigger className="w-20">
                 <SelectValue placeholder="Spacing" />
@@ -187,7 +217,7 @@ export const DeckEditorSettings = memo((props: DeckEditorSettingsProps) => {
           render={({ field }) => (
             <Select
               value={(field.value ?? 0).toString()}
-              onValueChange={(value) => field.onChange(Number(value))}
+              onValueChange={(value: string) => field.onChange(Number(value))}
             >
               <SelectTrigger className="w-20">
                 <SelectValue placeholder="Border raduis" />
@@ -206,26 +236,26 @@ export const DeckEditorSettings = memo((props: DeckEditorSettingsProps) => {
         />
       </div>
 
-      <Separator className="mb-4" />
-      <div className="flex col-end-5 justify-end">
-        <Button
-          type="button"
-          onClick={handleImport}
-          variant={"outline"}
-          className="ml-2"
-        >
-          Import
-          <ImportIcon />
-        </Button>
-        <Button
-          type="button"
-          onClick={handleExport}
-          variant={"ghost"}
-          className="ml-2"
-        >
-          Export
-        </Button>
-      </div>
+      {/* <Separator className="mb-4" /> */}
+      {/* <div className="flex col-end-5 justify-end"> */}
+      {/*   <Button */}
+      {/*     type="button" */}
+      {/*     onClick={handleImport} */}
+      {/*     variant={"outline"} */}
+      {/*     className="ml-2" */}
+      {/*   > */}
+      {/*     Import */}
+      {/*     <ImportIcon /> */}
+      {/*   </Button> */}
+      {/*   <Button */}
+      {/*     type="button" */}
+      {/*     onClick={handleExport} */}
+      {/*     variant={"ghost"} */}
+      {/*     className="ml-2" */}
+      {/*   > */}
+      {/*     Export */}
+      {/*   </Button> */}
+      {/* </div> */}
     </Form>
   );
 });

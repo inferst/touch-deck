@@ -1,35 +1,18 @@
-import {
-  DeckEditorSettings,
-  DeckEditorSettingsFormData,
-} from "@/components/DeckEditor/DeckSettings";
-import { useSettingsContext } from "@/context/SettingsContext";
-import { useSettingsMutation } from "@/mutations/settings";
+import { DeckEditorSettings } from "@/components/DeckEditor/DeckSettings";
 import { cn } from "@workspace/ui/lib/utils";
 import { useLogRenders } from "@workspace/utils/debug";
-import { memo, useCallback, useMemo } from "react";
+import { memo, useMemo } from "react";
 
 export type SidebarProps = {
   isOpened: boolean;
 };
 
 export const Sidebar = memo((props: SidebarProps) => {
-  useLogRenders('Sidebar');
+  useLogRenders("Sidebar");
 
   const { isOpened } = props;
 
-  const settings = useSettingsContext();
-  const { mutate } = useSettingsMutation();
-
   const width = useMemo(() => (isOpened ? "300px" : "0"), [isOpened]);
-
-  const handleChange = useCallback(
-    (form: DeckEditorSettingsFormData) => {
-      if (settings) {
-        mutate({ ...settings, ...form });
-      }
-    },
-    [mutate, settings],
-  );
 
   return (
     <div
@@ -54,7 +37,7 @@ export const Sidebar = memo((props: SidebarProps) => {
     >
       <div className={cn("p-6", "overflow-hidden", "w-[300px]")}>
         <div className="mb-6">Deck Settings</div>
-        <DeckEditorSettings data={settings} onChange={handleChange} />
+        <DeckEditorSettings />
       </div>
     </div>
   );

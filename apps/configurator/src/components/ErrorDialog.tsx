@@ -1,4 +1,3 @@
-import { useAppContext } from "@/context/AppContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,18 +10,22 @@ import {
 import { useLogRenders } from "@workspace/utils/debug";
 import { memo } from "react";
 
-export const ErrorDialog = memo(() => {
-  useLogRenders('ErrorDialog');
+export type ErrorDialogProps = {
+  error: Error;
+};
 
-  const context = useAppContext();
+export const ErrorDialog = memo((props: ErrorDialogProps) => {
+  const { error } = props;
+
+  useLogRenders("ErrorDialog");
 
   return (
-    context.error && (
+    error && (
       <AlertDialog defaultOpen={true}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Error</AlertDialogTitle>
-            <AlertDialogDescription>{context.error}</AlertDialogDescription>
+            <AlertDialogDescription>{error.toString()}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction>Close</AlertDialogAction>

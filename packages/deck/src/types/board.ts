@@ -72,12 +72,14 @@ export const SpacingSchema = z.union([
 export type Spacing = z.infer<typeof SpacingSchema>;
 
 export const CellSchema = z.object({
-  id: z.string(),
+  id: z.number().optional(),
+  boardId: z.number(),
+  row: z.number(),
+  col: z.number(),
   title: TitleSchema.optional(),
   icon: IconSchema.optional(),
   background: BackgroundSchema.optional(),
-  type: z.string().optional(),
-  data: z.looseObject({}).optional(),
+  type: z.string(),
 });
 
 export type Cell = z.infer<typeof CellSchema>;

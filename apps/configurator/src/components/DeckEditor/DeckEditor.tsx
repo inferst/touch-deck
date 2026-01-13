@@ -1,18 +1,13 @@
 import { DeckEditorItem } from "@/components/DeckEditor/DeckEditorItem";
 import { InstanceIdContext } from "@/components/Instance";
-import { useDeckContext } from "@/context/DeckContext";
-import { useSettingsContext } from "@/context/SettingsContext";
-import { useDeckMutation } from "@/mutations/deck";
+import { useSetActionMutation, useSwapItemsMutation } from "@/mutations/action";
+import { useBoardQuery } from "@/queries/board";
+import { useLayoutQuery, useStyleQuery } from "@/queries/profile";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import {
-  findCellById,
-  generateBoard,
-  getCell,
-  setCell,
-  setCellById,
-} from "@workspace/deck/board";
 import { DeckGrid } from "@workspace/deck/components/DeckGrid";
-import { Board, Cell } from "@workspace/deck/types/board";
+import { BoardDto } from "@workspace/deck/dto/BoardDto";
+import { Cell, Spacing } from "@workspace/deck/types/board";
+import { TitleSchema } from "@workspace/deck/types/field";
 import { useLogRenders } from "@workspace/utils/debug";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
@@ -21,51 +16,68 @@ function getInstanceId() {
 }
 
 type DeckProps = {
-  page: number;
+  boardId: number;
 };
+
+function getCell(board: BoardDto, row: number, col: number): Cell | undefined {
+  const action = board.actions.find(
+    (action) => action.item.row == row && action.item.col == col,
+  );
+
+  if (action) {
+    return {
+      id: action.item.id,
+      boardId: action.item.boardId,
+      col: action.item.col,
+      row: action.item.row,
+      background: {
+        color: action.color?.value ?? undefined,
+      },
+      type: action.item.kind,
+      icon: {
+        icon: action.icon?.name ?? undefined,
+        color: action.icon?.color ?? undefined,
+      },
+      title: {
+        title: action.title?.value ?? undefined,
+        color: action.title?.color ?? undefined,
+        align: TitleSchema.shape.align.parse(action.title?.align ?? "bottom"),
+        font: action.title?.font ?? undefined,
+      },
+    };
+  } else {
+    return {
+      boardId: board.board.id,
+      col: col,
+      row: row,
+      background: {},
+      type: "",
+      icon: { icon: "" },
+      title: { title: "" },
+    };
+  }
+}
 
 export const DeckEditor = memo((props: DeckProps) => {
   useLogRenders("DeckEditor");
 
-  const { page } = props;
+  const { boardId } = props;
 
-  const settings = useSettingsContext();
-  const deck = useDeckContext();
+  const board = useBoardQuery(boardId);
+  const layout = useLayoutQuery(1);
+  const style = useStyleQuery(1);
 
-  const { mutate } = useDeckMutation();
+  console.log("board", board.data.actions);
 
-  const handleSave = useCallback(
-    (pageId: string, board: Board) => {
-      mutate({
-        ...deck,
-        pages: deck.pages.map((page) => {
-          if (pageId == page.id) {
-            return {
-              ...page,
-              board: board,
-            };
-          }
-
-          return page;
-        }),
-      });
-    },
-    [deck, mutate],
-  );
+  const actionMutate = useSetActionMutation();
+  const swapItemsMutate = useSwapItemsMutation();
 
   const [instanceId] = useState(getInstanceId);
 
-  const rows = settings.layout.rows;
-  const cols = settings.layout.columns;
+  const rows = layout.data.layout.rows ?? 3;
+  const cols = layout.data.layout.cols ?? 5;
 
-  const board = useMemo(() => {
-    const board = deck.pages[page]?.board ?? {};
-    return generateBoard(rows, cols, board);
-  }, [rows, cols, deck.pages, page]);
-
-  const pageId = useMemo(() => {
-    return deck.pages[page]?.id;
-  }, [deck.pages, page]);
+  const spacing = style.data.style.spacing ?? 2;
 
   useEffect(() => {
     return monitorForElements({
@@ -79,79 +91,82 @@ export const DeckEditor = memo((props: DeckProps) => {
           return;
         }
 
-        const dropId = destination.data.id;
-        const dragId = source.data.id;
+        const dropRow = destination.data.row;
+        const dropCol = destination.data.col;
 
-        if (typeof dropId !== "string") {
+        const dragRow = source.data.row;
+        const dragCol = source.data.col;
+
+        console.log(dropRow, dropCol, dragRow, dragCol);
+
+        if (
+          typeof dropRow !== "number" ||
+          typeof dropCol !== "number" ||
+          typeof dragRow !== "number" ||
+          typeof dragCol !== "number"
+        ) {
           return;
         }
 
-        if (typeof dragId !== "string") {
-          return;
-        }
-
-        if (pageId) {
-          const dropCell = findCellById(board, dropId);
-          const dragCell = findCellById(board, dragId);
-
-          if (dropCell && dragCell) {
-            const withDrag = setCell(
-              board,
-              dropCell.row,
-              dropCell.col,
-              dragCell.cell,
-            );
-
-            const withDrop = setCell(
-              withDrag,
-              dragCell.row,
-              dragCell.col,
-              dropCell.cell,
-            );
-
-            handleSave(pageId, withDrop);
-          }
-        }
+        swapItemsMutate.mutate({
+          row1: dragRow,
+          col1: dragCol,
+          row2: dropRow,
+          col2: dropCol,
+        });
       },
     });
-  }, [instanceId, pageId, board, handleSave]);
+  }, [instanceId, swapItemsMutate]);
 
   const handleFormSave = useCallback(
     (data: Cell) => {
-      const updated = setCellById(board, data);
-      if (pageId) {
-        handleSave(pageId, updated);
-      }
+      actionMutate.mutate({
+        item: {
+          id: data.id ?? null,
+          boardId: data.boardId,
+          row: data.row,
+          col: data.col,
+          kind: data.type,
+        },
+        title: {
+          itemId: null,
+          value: data.title?.title ?? null,
+          align: data.title?.align ?? null,
+          color: data.title?.color ?? null,
+          font: data.title?.font ?? null,
+          size: data.title?.size ?? null,
+        },
+        icon: {
+          itemId: null,
+          name: data.icon?.icon ?? null,
+          color: data.icon?.color ?? null,
+        },
+        image: null,
+        color: {
+          itemId: null,
+          value: data.background?.color ?? null,
+        },
+      });
     },
-    [pageId, board, handleSave],
+    [actionMutate],
   );
 
-  const maxWidth = useMemo(
-    () => settings.layout.columns * 160,
-    [settings.layout.columns],
-  );
-  const maxHeight = useMemo(
-    () => settings.layout.rows * 160,
-    [settings.layout.rows],
-  );
-
-  if (!pageId) {
-    return "Page not found";
-  }
+  const maxWidth = useMemo(() => cols * 160, [cols]);
+  const maxHeight = useMemo(() => rows * 160, [rows]);
 
   return (
     <InstanceIdContext.Provider value={instanceId}>
       <DeckGrid
-        key={pageId}
-        rows={settings.layout.rows}
-        columns={settings.layout.columns}
-        spacing={settings.style.spacing}
+        key={boardId}
+        rows={rows}
+        columns={cols}
+        spacing={spacing as Spacing}
         maxWidth={maxWidth}
         maxHeight={maxHeight}
         className="w-full h-full flex justify-center items-center"
       >
         {(row, col) => {
-          const cell = getCell(board, row, col);
+          const cell = getCell(board.data, row, col);
           return cell && <DeckEditorItem cell={cell} onSave={handleFormSave} />;
         }}
       </DeckGrid>

@@ -1,13 +1,13 @@
 import { DeckEditorItemDialogContent } from "@/components/DeckEditor/DeckEditorItemDialogContent";
 import { InstanceIdContext } from "@/components/Instance";
-import { useSettingsContext } from "@/context/SettingsContext";
+import { useStyleQuery } from "@/queries/profile";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import {
   draggable,
   dropTargetForElements,
 } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { DeckGridCell } from "@workspace/deck/components/DeckGridCell";
-import { Cell } from "@workspace/deck/types/board";
+import { BorderRadius, Cell } from "@workspace/deck/types/board";
 import {
   FullscreenDialog,
   FullscreenDialogContent,
@@ -34,7 +34,7 @@ export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
 
   const { cell, onSave } = props;
 
-  const settings = useSettingsContext();
+  const style = useStyleQuery(1);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -69,11 +69,17 @@ export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
     return combine(
       draggable({
         element: element,
-        getInitialData: () => ({ type: "cell", id: cell.id, instanceId }),
+        getInitialData: () => ({
+          type: "cell",
+          id: cell.id,
+          row: cell.row,
+          col: cell.col,
+          instanceId,
+        }),
       }),
       dropTargetForElements({
         element: element,
-        getData: () => ({ id: cell.id }),
+        getData: () => ({ id: cell.id, row: cell.row, col: cell.col }),
         getIsSticky: () => false,
         canDrop: ({ source }) =>
           source.data.instanceId === instanceId &&
@@ -84,7 +90,7 @@ export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
         onDrop: () => setIsDragOver(false),
       }),
     );
-  }, [instanceId, cell.id]);
+  }, [instanceId, cell.id, cell.row, cell.col]);
 
   const borderColor = useMemo(
     () => (isDragOver ? "#ccc" : undefined),
@@ -118,6 +124,8 @@ export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
     setIsHovered(false);
   }, []);
 
+  const borderRadius = style.data.style.borderRadius as BorderRadius;
+
   return (
     <FullscreenDialog open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <FullscreenDialogTrigger asChild>
@@ -128,7 +136,7 @@ export const DeckEditorItem = memo((props: DeckEditorItemProps) => {
           iconSize={iconSize}
           backgroundColor={backgroundColor}
           borderColor={borderColor}
-          borderRadius={settings.style.borderRadius}
+          borderRadius={borderRadius}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         />
